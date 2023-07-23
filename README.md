@@ -1,5 +1,7 @@
 # Easy Excel
 
+[繁體中文文檔](README_ZH.md)
+
 ## About
 
 Based on the apache-poi framework, Easy Excel provides easy reading and writing of xls and xlsx files.
