@@ -1,9 +1,10 @@
 package io.github.af19git5.service;
 
-import io.github.af19git5.entity.ExcelStyle;
-import io.github.af19git5.exception.ExcelException;
 import io.github.af19git5.entity.ExcelCell;
 import io.github.af19git5.entity.ExcelSheet;
+import io.github.af19git5.entity.ExcelStyle;
+import io.github.af19git5.exception.ExcelException;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -69,11 +70,11 @@ public class ReadExcelService {
     }
 
     /**
-     * 讀取頁籤資料
+     * 讀取工作表資料
      *
      * @param workbook excel資料
-     * @param sheet 頁籤資料
-     * @return 頁籤資料
+     * @param sheet 工作表資料
+     * @return 工作表資料
      */
     private ExcelSheet readSheet(HSSFWorkbook workbook, HSSFSheet sheet) {
         ExcelSheet excelSheet = new ExcelSheet(sheet.getSheetName(), new ArrayList<>());
@@ -99,11 +100,11 @@ public class ReadExcelService {
     }
 
     /**
-     * 讀取頁籤資料
+     * 讀取工作表資料
      *
      * @param workbook excel資料
-     * @param sheet 頁籤資料
-     * @return 頁籤資料
+     * @param sheet 工作表資料
+     * @return 工作表資料
      */
     private ExcelSheet readSheet(XSSFWorkbook workbook, XSSFSheet sheet) {
         ExcelSheet excelSheet = new ExcelSheet(sheet.getSheetName(), new ArrayList<>());

@@ -33,10 +33,10 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     }
 
     /**
-     * 建立頁籤
+     * 建立工作表
      *
-     * @param sheetCode 頁籤代碼
-     * @param name 頁籤名稱
+     * @param sheetCode 工作表代碼
+     * @param name 工作表名稱
      * @return 原方法
      */
     public ExcelStreamWriteBuilder createSheet(String sheetCode, String name) {
@@ -48,7 +48,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     /**
      * 增加表格欄位合併規則
      *
-     * @param sheetCode 頁籤代碼
+     * @param sheetCode 工作表代碼
      * @param cellRangeAddresses 欄位合併規則
      * @return 原方法
      */
@@ -67,7 +67,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     /**
      * 增加表格欄位合併規則
      *
-     * @param sheetCode 頁籤代碼
+     * @param sheetCode 工作表代碼
      * @param cellRangeAddressList 欄位合併規則
      * @return 原方法
      */
@@ -80,7 +80,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     /**
      * 新增欄位資料
      *
-     * @param sheetCode 頁籤代碼
+     * @param sheetCode 工作表代碼
      * @param cells 欄位資料
      * @return 原方法
      */
@@ -96,7 +96,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     /**
      * 新增欄位資料
      *
-     * @param sheetCode 頁籤代碼
+     * @param sheetCode 工作表代碼
      * @param cellList 欄位資料
      * @return 原方法
      */

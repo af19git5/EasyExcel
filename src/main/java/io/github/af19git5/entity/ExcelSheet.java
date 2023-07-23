@@ -7,14 +7,14 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import java.util.*;
 
 /**
- * Excel頁籤資料
+ * Excel工作表資料
  *
  * @author Jimmy Kang
  */
 @Data
 public class ExcelSheet {
 
-    /** 頁籤名稱 */
+    /** 工作表名稱 */
     private String name = "";
 
     /** 欄位資料 */
