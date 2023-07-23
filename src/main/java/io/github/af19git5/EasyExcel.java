@@ -1,5 +1,6 @@
 package io.github.af19git5;
 
+import io.github.af19git5.builder.ExcelStreamWriteBuilder;
 import io.github.af19git5.builder.ExcelWriteBuilder;
 import io.github.af19git5.entity.ExcelSheet;
 import io.github.af19git5.exception.ExcelException;
@@ -44,5 +45,14 @@ public class EasyExcel {
      */
     public static ExcelWriteBuilder write() {
         return new ExcelWriteBuilder();
+    }
+
+    /**
+     * 寫出excel資料(資料流輸出, 可以用在大檔匯出)
+     *
+     * @return excel寫出檢購器
+     */
+    public static ExcelStreamWriteBuilder writeStream() {
+        return new ExcelStreamWriteBuilder();
     }
 }

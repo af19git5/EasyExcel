@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * excel寫出檢購器
+ * excel寫出建構器
  *
  * @author Jimmy Kang
  */
@@ -80,6 +80,13 @@ public class ExcelWriteBuilder {
                     case BOOLEAN:
                         hssfCell.setCellValue(Boolean.parseBoolean(cell.getValue()));
                         break;
+                    case NUMERIC:
+                        hssfCell.setCellType(cell.getCellType());
+                        try {
+                            hssfCell.setCellValue(Double.parseDouble(cell.getValue()));
+                        } catch (NumberFormatException e) {
+                            hssfCell.setCellValue(0);
+                        }
                     default:
                         hssfCell.setCellType(cell.getCellType());
                         hssfCell.setCellValue(cell.getValue());
@@ -126,6 +133,13 @@ public class ExcelWriteBuilder {
                     case BOOLEAN:
                         xssfCell.setCellValue(Boolean.parseBoolean(cell.getValue()));
                         break;
+                    case NUMERIC:
+                        xssfCell.setCellType(cell.getCellType());
+                        try {
+                            xssfCell.setCellValue(Double.parseDouble(cell.getValue()));
+                        } catch (NumberFormatException e) {
+                            xssfCell.setCellValue(0);
+                        }
                     default:
                         xssfCell.setCellType(cell.getCellType());
                         xssfCell.setCellValue(cell.getValue());
@@ -136,7 +150,6 @@ public class ExcelWriteBuilder {
                 }
                 xssfSheet.autoSizeColumn(cell.getColumn(), true);
             }
-
             // 處理表格欄位合併
             for (CellRangeAddress cellAddresses : sheet.getCellRangeAddressList()) {
                 xssfSheet.addMergedRegionUnsafe(cellAddresses);
@@ -160,6 +173,15 @@ public class ExcelWriteBuilder {
             throw new ExcelException(e);
         }
         return bytes;
+    }
+
+    /**
+     * 輸出xls
+     *
+     * @param filePath 儲存檔案位置
+     */
+    public void outputXls(String filePath) throws ExcelException {
+        outputXls(new File(filePath));
     }
 
     /**
@@ -191,6 +213,15 @@ public class ExcelWriteBuilder {
             throw new ExcelException(e);
         }
         return bytes;
+    }
+
+    /**
+     * 輸出xlsx
+     *
+     * @param filePath 儲存檔案位置
+     */
+    public void outputXlsx(String filePath) throws ExcelException {
+        outputXlsx(new File(filePath));
     }
 
     /**

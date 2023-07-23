@@ -1,6 +1,7 @@
 package io.github.af19git5.entity;
 
 import lombok.Data;
+
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFPalette;
@@ -57,7 +58,7 @@ public class ExcelStyle {
     public String fontName;
 
     /** 文字大小 */
-    public Integer fontSize = 12;
+    public Integer fontSize = 10;
 
     /** 是否為粗體 */
     public Boolean bold = false;
@@ -115,6 +116,22 @@ public class ExcelStyle {
      */
     private boolean isValidColorHex(String colorHex) {
         return colorHex.matches("^#(?:[0-9a-fA-F]{3}){1,2}$");
+    }
+
+    public void setAllBorder(BorderStyle borderStyle) {
+        this.borderTop = borderStyle;
+        this.borderBottom = borderStyle;
+        this.borderLeft = borderStyle;
+        this.borderRight = borderStyle;
+    }
+
+    public void setAllBorderColor(String colorHex) {
+        if (isValidColorHex(colorHex)) {
+            this.borderTopColor = colorHex;
+            this.borderBottomColor = colorHex;
+            this.borderLeftColor = colorHex;
+            this.borderRightColor = colorHex;
+        }
     }
 
     public ExcelStyle() {}
@@ -244,6 +261,7 @@ public class ExcelStyle {
                             (byte) rgbColor.getGreen(),
                             (byte) rgbColor.getBlue());
             cellStyle.setFillForegroundColor(color.getIndex());
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
 
         HSSFFont font = workbook.createFont();
@@ -310,6 +328,7 @@ public class ExcelStyle {
                     XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
             color.setARGBHex(this.backgroundColor.substring(1));
             cellStyle.setFillForegroundColor(color);
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         }
 
         XSSFFont font = workbook.createFont();
