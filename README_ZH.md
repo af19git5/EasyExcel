@@ -6,7 +6,15 @@
 
 ## 如何使用在自己專案中
 
-待補...
+將以下代碼加入至專案中的pom.xml dependencies.
+
+```xml
+<dependency>
+  <groupId>io.github.af19git5</groupId>
+  <artifactId>easy-excel</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
 ## 如何使用
 

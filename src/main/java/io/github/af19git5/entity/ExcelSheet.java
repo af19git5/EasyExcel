@@ -4,7 +4,11 @@ import lombok.Data;
 
 import org.apache.poi.ss.util.CellRangeAddress;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Excel工作表資料
@@ -37,7 +41,8 @@ public class ExcelSheet {
      */
     public List<List<String>> toValueList() {
         List<ExcelCell> cellList = new ArrayList<>(this.cellList);
-        cellList.sort(new CellComparator());
+        cellList.sort(
+                Comparator.comparingInt(ExcelCell::getRow).thenComparingInt(ExcelCell::getColumn));
         Map<Integer, List<String>> dataMap = new LinkedHashMap<>();
         for (ExcelCell cell : cellList) {
             List<String> columnList =
@@ -47,16 +52,5 @@ public class ExcelSheet {
         List<List<String>> dataList = new ArrayList<>();
         dataMap.forEach((integer, columnList) -> dataList.add(columnList));
         return dataList;
-    }
-
-    private static class CellComparator implements Comparator<ExcelCell> {
-        @Override
-        public int compare(ExcelCell cell1, ExcelCell cell2) {
-            int result = Integer.compare(cell1.getRow(), cell2.getRow());
-            if (result == 0) {
-                result = Integer.compare(cell1.getColumn(), cell2.getColumn());
-            }
-            return result;
-        }
     }
 }

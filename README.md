@@ -8,7 +8,15 @@ Based on the apache-poi framework, Easy Excel provides easy reading and writing 
 
 ## How to Use in Your Project
 
-To be filled...
+Add this in your pom.xml dependencies.
+
+```xml
+<dependency>
+  <groupId>io.github.af19git5</groupId>
+  <artifactId>easy-excel</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
 ## How to Use
 
