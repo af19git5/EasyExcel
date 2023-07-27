@@ -17,6 +17,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,18 @@ public class ReadExcelService {
     /**
      * 讀取excel資料
      *
+     * @param excelFilePath excel檔案路徑
+     * @param password 密碼
+     * @return excel資料
+     * @throws ExcelException Excel處理錯誤
+     */
+    public List<ExcelSheet> read(String excelFilePath, String password) throws ExcelException {
+        return read(new File(excelFilePath), password);
+    }
+
+    /**
+     * 讀取excel資料
+     *
      * @param excelFile excel檔案
      * @return excel資料
      * @throws ExcelException Excel處理錯誤
@@ -48,23 +61,89 @@ public class ReadExcelService {
     public List<ExcelSheet> read(File excelFile) throws ExcelException {
         List<ExcelSheet> excelSheetList = new ArrayList<>();
         try (Workbook workbook = WorkbookFactory.create(excelFile)) {
-            if (workbook instanceof XSSFWorkbook) {
-                XSSFWorkbook xssfWorkbook = (XSSFWorkbook) workbook;
-                for (int sheetNum = 0; sheetNum < xssfWorkbook.getNumberOfSheets(); sheetNum++) {
-                    XSSFSheet sheet = xssfWorkbook.getSheetAt(sheetNum);
-                    excelSheetList.add(readSheet(xssfWorkbook, sheet));
-                }
-            } else if (workbook instanceof HSSFWorkbook) {
-                HSSFWorkbook hssfWorkbook = (HSSFWorkbook) workbook;
-                for (int sheetNum = 0; sheetNum < hssfWorkbook.getNumberOfSheets(); sheetNum++) {
-                    HSSFSheet sheet = hssfWorkbook.getSheetAt(sheetNum);
-                    excelSheetList.add(readSheet(hssfWorkbook, sheet));
-                }
-            } else {
-                throw new ExcelException("File is not excel.");
-            }
+            excelSheetList.addAll(read(workbook));
         } catch (IOException e) {
             throw new ExcelException(e.getMessage());
+        }
+        return excelSheetList;
+    }
+
+    /**
+     * 讀取excel資料
+     *
+     * @param excelFile excel檔案
+     * @param password 密碼
+     * @return excel資料
+     * @throws ExcelException Excel處理錯誤
+     */
+    public List<ExcelSheet> read(File excelFile, String password) throws ExcelException {
+        List<ExcelSheet> excelSheetList = new ArrayList<>();
+        try (Workbook workbook = WorkbookFactory.create(excelFile, password)) {
+            excelSheetList.addAll(read(workbook));
+        } catch (IOException e) {
+            throw new ExcelException(e.getMessage());
+        }
+        return excelSheetList;
+    }
+
+    /**
+     * 讀取excel資料
+     *
+     * @param inputStream InputStream
+     * @return excel資料
+     * @throws ExcelException Excel處理錯誤
+     */
+    public List<ExcelSheet> read(InputStream inputStream) throws ExcelException {
+        List<ExcelSheet> excelSheetList = new ArrayList<>();
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+            excelSheetList.addAll(read(workbook));
+        } catch (IOException e) {
+            throw new ExcelException(e.getMessage());
+        }
+        return excelSheetList;
+    }
+
+    /**
+     * 讀取excel資料
+     *
+     * @param inputStream InputStream
+     * @param password 密碼
+     * @return excel資料
+     * @throws ExcelException Excel處理錯誤
+     */
+    public List<ExcelSheet> read(InputStream inputStream, String password) throws ExcelException {
+        List<ExcelSheet> excelSheetList = new ArrayList<>();
+        try (Workbook workbook = WorkbookFactory.create(inputStream, password)) {
+            excelSheetList.addAll(read(workbook));
+        } catch (IOException e) {
+            throw new ExcelException(e.getMessage());
+        }
+        return excelSheetList;
+    }
+
+    /**
+     * 讀取excel資料
+     *
+     * @param workbook Workbook
+     * @return excel資料
+     * @throws ExcelException Excel處理錯誤
+     */
+    private List<ExcelSheet> read(Workbook workbook) throws ExcelException {
+        List<ExcelSheet> excelSheetList = new ArrayList<>();
+        if (workbook instanceof XSSFWorkbook) {
+            XSSFWorkbook xssfWorkbook = (XSSFWorkbook) workbook;
+            for (int sheetNum = 0; sheetNum < xssfWorkbook.getNumberOfSheets(); sheetNum++) {
+                XSSFSheet sheet = xssfWorkbook.getSheetAt(sheetNum);
+                excelSheetList.add(readSheet(xssfWorkbook, sheet));
+            }
+        } else if (workbook instanceof HSSFWorkbook) {
+            HSSFWorkbook hssfWorkbook = (HSSFWorkbook) workbook;
+            for (int sheetNum = 0; sheetNum < hssfWorkbook.getNumberOfSheets(); sheetNum++) {
+                HSSFSheet sheet = hssfWorkbook.getSheetAt(sheetNum);
+                excelSheetList.add(readSheet(hssfWorkbook, sheet));
+            }
+        } else {
+            throw new ExcelException("File is not excel.");
         }
         return excelSheetList;
     }
