@@ -68,4 +68,45 @@ public class ExcelStreamCell {
         this.cellType = cellType;
         this.style = style;
     }
+
+    public ExcelStreamCell(@NonNull Integer row, @NonNull Integer column, @NonNull String value) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+    }
+
+    public ExcelStreamCell(
+            @NonNull Integer row,
+            @NonNull Integer column,
+            @NonNull String value,
+            @NonNull CellType cellType) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+        this.cellType = cellType;
+    }
+
+    public ExcelStreamCell(
+            @NonNull Integer row,
+            @NonNull Integer column,
+            @NonNull String value,
+            ExcelStreamStyle style) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+        this.style = style;
+    }
+
+    public ExcelStreamCell(
+            @NonNull Integer row,
+            @NonNull Integer column,
+            @NonNull String value,
+            @NonNull CellType cellType,
+            ExcelStreamStyle style) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+        this.cellType = cellType;
+        this.style = style;
+    }
 }

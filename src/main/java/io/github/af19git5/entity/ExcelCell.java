@@ -67,4 +67,45 @@ public class ExcelCell {
         this.cellType = cellType;
         this.style = style;
     }
+
+    public ExcelCell(@NonNull Integer row, @NonNull Integer column, @NonNull String value) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+    }
+
+    public ExcelCell(
+            @NonNull Integer row,
+            @NonNull Integer column,
+            @NonNull String value,
+            @NonNull CellType cellType) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+        this.cellType = cellType;
+    }
+
+    public ExcelCell(
+            @NonNull Integer row,
+            @NonNull Integer column,
+            @NonNull String value,
+            ExcelStyle style) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+        this.style = style;
+    }
+
+    public ExcelCell(
+            @NonNull Integer row,
+            @NonNull Integer column,
+            @NonNull String value,
+            @NonNull CellType cellType,
+            ExcelStyle style) {
+        this.value = value;
+        this.row = row;
+        this.column = column;
+        this.cellType = cellType;
+        this.style = style;
+    }
 }
