@@ -2,8 +2,6 @@ package io.github.af19git5.entity;
 
 import lombok.Data;
 
-import org.apache.poi.ss.util.CellRangeAddress;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -25,7 +23,7 @@ public class ExcelSheet {
     private List<ExcelCell> cellList = new ArrayList<>();
 
     /** 合併欄位規則 */
-    private List<CellRangeAddress> cellRangeAddressList = new ArrayList<>();
+    private List<ExcelMergedRegion> mergedRegionList = new ArrayList<>();
 
     public ExcelSheet() {}
 

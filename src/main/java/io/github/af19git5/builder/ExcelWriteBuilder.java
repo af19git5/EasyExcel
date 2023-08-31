@@ -1,6 +1,7 @@
 package io.github.af19git5.builder;
 
 import io.github.af19git5.entity.ExcelCell;
+import io.github.af19git5.entity.ExcelMergedRegion;
 import io.github.af19git5.entity.ExcelSheet;
 import io.github.af19git5.exception.ExcelException;
 
@@ -8,6 +9,7 @@ import lombok.NonNull;
 
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -102,8 +104,19 @@ public class ExcelWriteBuilder {
                 hssfSheet.autoSizeColumn(cell.getColumn(), true);
             }
             // 處理表格欄位合併
-            for (CellRangeAddress cellAddresses : sheet.getCellRangeAddressList()) {
+            for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
+                CellRangeAddress cellAddresses =
+                        new CellRangeAddress(
+                                mergedRegion.getFirstRow(),
+                                mergedRegion.getLastRow(),
+                                mergedRegion.getFirstColumn(),
+                                mergedRegion.getLastColumn());
                 hssfSheet.addMergedRegionUnsafe(cellAddresses);
+                RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, hssfSheet);
+                RegionUtil.setBorderBottom(
+                        mergedRegion.getBorderBottom(), cellAddresses, hssfSheet);
+                RegionUtil.setBorderLeft(mergedRegion.getBorderLeft(), cellAddresses, hssfSheet);
+                RegionUtil.setBorderRight(mergedRegion.getBorderRight(), cellAddresses, hssfSheet);
             }
         }
         return workbook;
@@ -155,8 +168,19 @@ public class ExcelWriteBuilder {
                 xssfSheet.autoSizeColumn(cell.getColumn(), true);
             }
             // 處理表格欄位合併
-            for (CellRangeAddress cellAddresses : sheet.getCellRangeAddressList()) {
+            for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
+                CellRangeAddress cellAddresses =
+                        new CellRangeAddress(
+                                mergedRegion.getFirstRow(),
+                                mergedRegion.getLastRow(),
+                                mergedRegion.getFirstColumn(),
+                                mergedRegion.getLastColumn());
                 xssfSheet.addMergedRegionUnsafe(cellAddresses);
+                RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, xssfSheet);
+                RegionUtil.setBorderBottom(
+                        mergedRegion.getBorderBottom(), cellAddresses, xssfSheet);
+                RegionUtil.setBorderLeft(mergedRegion.getBorderLeft(), cellAddresses, xssfSheet);
+                RegionUtil.setBorderRight(mergedRegion.getBorderRight(), cellAddresses, xssfSheet);
             }
         }
         return workbook;

@@ -49,8 +49,11 @@ public class EasyExcelTests {
         style.setFontColor("#000079");
 
         ExcelSheet sheet = new ExcelSheet("工作表1", new ArrayList<>());
+        sheet.setMergedRegionList(new ArrayList<>());
         sheet.getCellList().add(new ExcelCell("測試資料1", 0, 0, style));
-        sheet.getCellList().add(new ExcelCell("測試資料2", 1, 0, style));
+        sheet.getCellList().add(new ExcelCell("測試資料1", 1, 0, style));
+        sheet.getCellList().add(new ExcelCell("測試資料2", 2, 0, style));
+        sheet.getMergedRegionList().add(new ExcelMergedRegion(0, 1, 0, 0, BorderStyle.THIN));
 
         ExcelWriteBuilder excelWriteBuilder = EasyExcel.write().addSheet(sheet);
 

@@ -1,6 +1,7 @@
 package io.github.af19git5.service;
 
 import io.github.af19git5.entity.ExcelCell;
+import io.github.af19git5.entity.ExcelMergedRegion;
 import io.github.af19git5.entity.ExcelSheet;
 import io.github.af19git5.entity.ExcelStyle;
 import io.github.af19git5.exception.ExcelException;
@@ -10,6 +11,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -157,7 +159,17 @@ public class ReadExcelService {
      */
     private ExcelSheet readSheet(HSSFWorkbook workbook, HSSFSheet sheet) {
         ExcelSheet excelSheet = new ExcelSheet(sheet.getSheetName(), new ArrayList<>());
-        excelSheet.setCellRangeAddressList(sheet.getMergedRegions());
+        excelSheet.setMergedRegionList(new ArrayList<>());
+        for (CellRangeAddress cellAddresses : sheet.getMergedRegions()) {
+            excelSheet
+                    .getMergedRegionList()
+                    .add(
+                            new ExcelMergedRegion(
+                                    cellAddresses.getFirstRow(),
+                                    cellAddresses.getLastRow(),
+                                    cellAddresses.getFirstColumn(),
+                                    cellAddresses.getLastColumn()));
+        }
         for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
             HSSFRow row = sheet.getRow(rowNum);
             if (null == row) continue;
@@ -187,7 +199,17 @@ public class ReadExcelService {
      */
     private ExcelSheet readSheet(XSSFWorkbook workbook, XSSFSheet sheet) {
         ExcelSheet excelSheet = new ExcelSheet(sheet.getSheetName(), new ArrayList<>());
-        excelSheet.setCellRangeAddressList(sheet.getMergedRegions());
+        excelSheet.setMergedRegionList(new ArrayList<>());
+        for (CellRangeAddress cellAddresses : sheet.getMergedRegions()) {
+            excelSheet
+                    .getMergedRegionList()
+                    .add(
+                            new ExcelMergedRegion(
+                                    cellAddresses.getFirstRow(),
+                                    cellAddresses.getLastRow(),
+                                    cellAddresses.getFirstColumn(),
+                                    cellAddresses.getLastColumn()));
+        }
         for (int rowNum = 0; rowNum <= sheet.getLastRowNum(); rowNum++) {
             XSSFRow row = sheet.getRow(rowNum);
             if (null == row) continue;
