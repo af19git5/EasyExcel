@@ -2,6 +2,7 @@ package io.github.af19git5.entity;
 
 import lombok.Data;
 import lombok.NonNull;
+
 import org.apache.poi.ss.usermodel.CellType;
 
 /**
@@ -27,48 +28,45 @@ public class ExcelCell {
     /** 欄位樣式 */
     private ExcelStyle style;
 
-    public ExcelCell(@NonNull String value, @NonNull Integer row, @NonNull Integer column) {
-        this.value = value;
+    public ExcelCell(String value, @NonNull Integer row, @NonNull Integer column) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
     }
 
     public ExcelCell(
-            @NonNull String value,
+            String value,
             @NonNull Integer row,
             @NonNull Integer column,
             @NonNull CellType cellType) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
     }
 
     public ExcelCell(
-            @NonNull String value,
-            @NonNull Integer row,
-            @NonNull Integer column,
-            ExcelStyle style) {
-        this.value = value;
+            String value, @NonNull Integer row, @NonNull Integer column, ExcelStyle style) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.style = style;
     }
 
     public ExcelCell(
-            @NonNull String value,
+            String value,
             @NonNull Integer row,
             @NonNull Integer column,
             @NonNull CellType cellType,
             ExcelStyle style) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
         this.style = style;
     }
 
-    public ExcelCell(@NonNull Integer row, @NonNull Integer column, @NonNull String value) {
+    public ExcelCell(@NonNull Integer row, @NonNull Integer column, String value) {
         this.value = value;
         this.row = row;
         this.column = column;
@@ -77,20 +75,17 @@ public class ExcelCell {
     public ExcelCell(
             @NonNull Integer row,
             @NonNull Integer column,
-            @NonNull String value,
+            String value,
             @NonNull CellType cellType) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
     }
 
     public ExcelCell(
-            @NonNull Integer row,
-            @NonNull Integer column,
-            @NonNull String value,
-            ExcelStyle style) {
-        this.value = value;
+            @NonNull Integer row, @NonNull Integer column, String value, ExcelStyle style) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.style = style;
@@ -99,10 +94,10 @@ public class ExcelCell {
     public ExcelCell(
             @NonNull Integer row,
             @NonNull Integer column,
-            @NonNull String value,
+            String value,
             @NonNull CellType cellType,
             ExcelStyle style) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;

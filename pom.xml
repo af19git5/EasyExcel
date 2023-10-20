@@ -6,7 +6,7 @@
 
     <groupId>io.github.af19git5</groupId>
     <artifactId>easy-excel</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
 
     <name>EasyExcel</name>
     <description>Easy to do read or write excel.</description>
