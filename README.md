@@ -14,7 +14,7 @@ Add this in your pom.xml dependencies.
 <dependency>
   <groupId>io.github.af19git5</groupId>
   <artifactId>easy-excel</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5</version>
 </dependency>
 ```
 
@@ -81,7 +81,7 @@ try (ExcelStreamWriteBuilder writeBuilder = EasyExcel.writeStream()) {
 ## License
 
 ```
-Copyright 2022 Jimmy Kang
+Copyright 2023 Jimmy Kang
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

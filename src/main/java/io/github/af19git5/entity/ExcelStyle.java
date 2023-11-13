@@ -160,7 +160,10 @@ public class ExcelStyle {
         this.bold = font.getBold();
         this.italic = font.getItalic();
         this.strikeout = font.getStrikeout();
-        this.fontColor = convertRGBToHex(font.getHSSFColor(workbook).getTriplet());
+        HSSFColor hssfColor = font.getHSSFColor(workbook);
+        if (null != hssfColor) {
+            this.fontColor = convertRGBToHex(hssfColor.getTriplet());
+        }
     }
 
     private String convertRGBToHex(short[] rgbArray) {
