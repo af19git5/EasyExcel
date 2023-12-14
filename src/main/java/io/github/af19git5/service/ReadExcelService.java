@@ -175,16 +175,21 @@ public class ReadExcelService {
             if (null == row) continue;
             for (int columnNum = 0; columnNum < row.getLastCellNum(); columnNum++) {
                 HSSFCell cell = row.getCell(columnNum);
-                if (cell == null) continue;
-                excelSheet
-                        .getCellList()
-                        .add(
-                                new ExcelCell(
-                                        cell.toString(),
-                                        rowNum,
-                                        columnNum,
-                                        cell.getCellType(),
-                                        new ExcelStyle(workbook, cell.getCellStyle())));
+                if (cell == null) {
+                    excelSheet
+                            .getCellList()
+                            .add(new ExcelCell("", rowNum, columnNum, CellType.STRING));
+                } else {
+                    excelSheet
+                            .getCellList()
+                            .add(
+                                    new ExcelCell(
+                                            cell.toString(),
+                                            rowNum,
+                                            columnNum,
+                                            cell.getCellType(),
+                                            new ExcelStyle(workbook, cell.getCellStyle())));
+                }
             }
         }
         return excelSheet;
@@ -215,16 +220,21 @@ public class ReadExcelService {
             if (null == row) continue;
             for (int columnNum = 0; columnNum < row.getLastCellNum(); columnNum++) {
                 XSSFCell cell = row.getCell(columnNum);
-                if (cell == null) continue;
-                excelSheet
-                        .getCellList()
-                        .add(
-                                new ExcelCell(
-                                        cell.toString(),
-                                        rowNum,
-                                        columnNum,
-                                        cell.getCellType(),
-                                        new ExcelStyle(cell.getCellStyle())));
+                if (cell == null) {
+                    excelSheet
+                            .getCellList()
+                            .add(new ExcelCell("", rowNum, columnNum, CellType.STRING));
+                } else {
+                    excelSheet
+                            .getCellList()
+                            .add(
+                                    new ExcelCell(
+                                            cell.toString(),
+                                            rowNum,
+                                            columnNum,
+                                            cell.getCellType(),
+                                            new ExcelStyle(cell.getCellStyle())));
+                }
             }
         }
         return excelSheet;
