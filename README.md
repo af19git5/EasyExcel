@@ -69,12 +69,12 @@ try (ExcelStreamWriteBuilder writeBuilder = EasyExcel.writeStream()) {
     style.setFontColor(IndexedColors.DARK_BLUE);
 
     writeBuilder
-    .createSheet("sheet", "Test Sheet")
-    .addCell("sheet", new ExcelStreamCell("Test Data 1", 0, 0, style))
-    .flush("sheet")
-    .addCell("sheet", new ExcelStreamCell("Test Data 2", 1, 0, style))
-    .flush("sheet")
-    .outputXlsx("Your output path.");
+        .createSheet("sheet", "Test Sheet")
+        .addCell("sheet", new ExcelStreamCell("Test Data 1", 0, 0, style))
+        .flush("sheet")
+        .addCell("sheet", new ExcelStreamCell("Test Data 2", 1, 0, style))
+        .flush("sheet")
+        .outputXlsx("Your output path.");
 }
 ```
 
