@@ -1,7 +1,8 @@
 package io.github.af19git5.entity;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import org.apache.poi.ss.usermodel.CellType;
 
@@ -10,7 +11,8 @@ import org.apache.poi.ss.usermodel.CellType;
  *
  * @author Jimmy Kang
  */
-@Data
+@Getter
+@Setter
 public class ExcelStreamCell {
 
     /** 欄位數值 */

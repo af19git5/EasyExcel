@@ -1,6 +1,7 @@
 package io.github.af19git5.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -18,8 +19,12 @@ import java.awt.Color;
  *
  * @author Jimmy Kang
  */
-@Data
+@Getter
+@Setter
 public class ExcelStyle {
+
+    /** 是否自動換行 */
+    private Boolean isWrapText = false;
 
     /** 上邊線樣式 */
     private BorderStyle borderTop = BorderStyle.NONE;
@@ -138,6 +143,7 @@ public class ExcelStyle {
 
     public ExcelStyle(HSSFWorkbook workbook, HSSFCellStyle cellStyle) {
         HSSFPalette palette = workbook.getCustomPalette();
+        this.isWrapText = cellStyle.getWrapText();
         this.borderTop = cellStyle.getBorderTop();
         this.borderBottom = cellStyle.getBorderBottom();
         this.borderLeft = cellStyle.getBorderLeft();
@@ -179,6 +185,7 @@ public class ExcelStyle {
     }
 
     public ExcelStyle(XSSFCellStyle cellStyle) {
+        this.isWrapText = cellStyle.getWrapText();
         this.borderTop = cellStyle.getBorderTop();
         this.borderBottom = cellStyle.getBorderBottom();
         this.borderLeft = cellStyle.getBorderLeft();
@@ -208,6 +215,7 @@ public class ExcelStyle {
     public HSSFCellStyle toHSSCellStyle(HSSFWorkbook workbook) {
         HSSFPalette palette = workbook.getCustomPalette();
         HSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(this.isWrapText);
         cellStyle.setBorderTop(this.borderTop);
         cellStyle.setBorderBottom(this.borderBottom);
         cellStyle.setBorderLeft(this.borderLeft);
@@ -283,13 +291,13 @@ public class ExcelStyle {
                             rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
             font.setColor(hssfColor.getIndex());
         }
-
         cellStyle.setFont(font);
         return cellStyle;
     }
 
     public CellStyle toXSSCellStyle(XSSFWorkbook workbook) {
         XSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(this.isWrapText);
         cellStyle.setBorderTop(this.borderTop);
         cellStyle.setBorderBottom(this.borderBottom);
         cellStyle.setBorderLeft(this.borderLeft);

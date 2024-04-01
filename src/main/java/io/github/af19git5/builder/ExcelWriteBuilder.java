@@ -8,6 +8,7 @@ import io.github.af19git5.exception.ExcelException;
 import lombok.NonNull;
 
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -101,10 +102,18 @@ public class ExcelWriteBuilder {
                 if (null != cell.getStyle()) {
                     hssfCell.setCellStyle(cell.getStyle().toHSSCellStyle(workbook));
                 }
-                hssfSheet.autoSizeColumn(cell.getColumn(), true);
+                if (!sheet.getHiddenRowNumList().contains(cell.getRow())
+                        || !sheet.getHiddenColumnNumList().contains(cell.getColumn())) {
+                    hssfSheet.autoSizeColumn(cell.getColumn(), true);
+                }
             }
             // 處理表格欄位合併
             for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
+                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
+                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
+                    // 欄位合併只有一格時略過處理
+                    continue;
+                }
                 CellRangeAddress cellAddresses =
                         new CellRangeAddress(
                                 mergedRegion.getFirstRow(),
@@ -112,12 +121,31 @@ public class ExcelWriteBuilder {
                                 mergedRegion.getFirstColumn(),
                                 mergedRegion.getLastColumn());
                 hssfSheet.addMergedRegionUnsafe(cellAddresses);
-                RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, hssfSheet);
-                RegionUtil.setBorderBottom(
-                        mergedRegion.getBorderBottom(), cellAddresses, hssfSheet);
-                RegionUtil.setBorderLeft(mergedRegion.getBorderLeft(), cellAddresses, hssfSheet);
-                RegionUtil.setBorderRight(mergedRegion.getBorderRight(), cellAddresses, hssfSheet);
+                if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, hssfSheet);
+                }
+                if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderBottom(
+                            mergedRegion.getBorderBottom(), cellAddresses, hssfSheet);
+                }
+                if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderLeft(
+                            mergedRegion.getBorderLeft(), cellAddresses, hssfSheet);
+                }
+                if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderRight(
+                            mergedRegion.getBorderRight(), cellAddresses, hssfSheet);
+                }
             }
+            // 處理行列隱藏
+            for (Integer rowNum : sheet.getHiddenRowNumList()) {
+                hssfSheet.getRow(rowNum).setZeroHeight(true);
+            }
+            for (Integer columnNum : sheet.getHiddenColumnNumList()) {
+                hssfSheet.setColumnHidden(columnNum, true);
+            }
+            // 處理欄位覆寫寬度
+            sheet.getOverrideColumnWidthMap().forEach(hssfSheet::setColumnWidth);
         }
         return workbook;
     }
@@ -165,10 +193,18 @@ public class ExcelWriteBuilder {
                 if (null != cell.getStyle()) {
                     xssfCell.setCellStyle(cell.getStyle().toXSSCellStyle(workbook));
                 }
-                xssfSheet.autoSizeColumn(cell.getColumn(), true);
+                if (!sheet.getHiddenRowNumList().contains(cell.getRow())
+                        || !sheet.getHiddenColumnNumList().contains(cell.getColumn())) {
+                    xssfSheet.autoSizeColumn(cell.getColumn(), true);
+                }
             }
             // 處理表格欄位合併
             for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
+                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
+                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
+                    // 欄位合併只有一格時略過處理
+                    continue;
+                }
                 CellRangeAddress cellAddresses =
                         new CellRangeAddress(
                                 mergedRegion.getFirstRow(),
@@ -176,12 +212,31 @@ public class ExcelWriteBuilder {
                                 mergedRegion.getFirstColumn(),
                                 mergedRegion.getLastColumn());
                 xssfSheet.addMergedRegionUnsafe(cellAddresses);
-                RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, xssfSheet);
-                RegionUtil.setBorderBottom(
-                        mergedRegion.getBorderBottom(), cellAddresses, xssfSheet);
-                RegionUtil.setBorderLeft(mergedRegion.getBorderLeft(), cellAddresses, xssfSheet);
-                RegionUtil.setBorderRight(mergedRegion.getBorderRight(), cellAddresses, xssfSheet);
+                if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, xssfSheet);
+                }
+                if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderBottom(
+                            mergedRegion.getBorderBottom(), cellAddresses, xssfSheet);
+                }
+                if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderLeft(
+                            mergedRegion.getBorderLeft(), cellAddresses, xssfSheet);
+                }
+                if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
+                    RegionUtil.setBorderRight(
+                            mergedRegion.getBorderRight(), cellAddresses, xssfSheet);
+                }
             }
+            // 處理行列隱藏
+            for (Integer rowNum : sheet.getHiddenRowNumList()) {
+                xssfSheet.getRow(rowNum).setZeroHeight(true);
+            }
+            for (Integer columnNum : sheet.getHiddenColumnNumList()) {
+                xssfSheet.setColumnHidden(columnNum, true);
+            }
+            // 處理欄位覆寫寬度
+            sheet.getOverrideColumnWidthMap().forEach(xssfSheet::setColumnWidth);
         }
         return workbook;
     }

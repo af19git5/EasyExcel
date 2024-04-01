@@ -1,6 +1,8 @@
 package io.github.af19git5.entity;
 
-import lombok.Data;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 
@@ -9,7 +11,8 @@ import org.apache.poi.ss.usermodel.BorderStyle;
  *
  * @author Jimmy Kang
  */
-@Data
+@Getter
+@Setter
 public class ExcelMergedRegion {
 
     /** 起始列 */
