@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,18 +42,24 @@ public class EasyExcelTests {
     /** 測試資料流寫出 */
     @Test
     public void testWrite() throws ExcelException {
-        ExcelStyle style = new ExcelStyle();
-        style.setAllBorder(BorderStyle.THIN);
-        style.setBackgroundColor("#FFF0AC");
-        style.setFontColor("#000079");
+        ExcelStyle style =
+                ExcelStyle.init()
+                        .border(BorderStyle.THIN, "#D3526F")
+                        .backgroundColor("#FFF0AC")
+                        .fontColor("#000079")
+                        .build();
 
-        ExcelSheet sheet = new ExcelSheet("工作表1", new ArrayList<>());
-        sheet.setMergedRegionList(new ArrayList<>());
-        sheet.getCellList().add(new ExcelCell("測試資料1", 0, 0, style));
-        sheet.getCellList().add(new ExcelCell("測試資料1", 1, 0, style));
-        sheet.getCellList().add(new ExcelCell("測試資料2", 2, 0, style));
-        sheet.getMergedRegionList().add(new ExcelMergedRegion(0, 1, 0, 0, BorderStyle.THIN));
-
+        ExcelSheet sheet =
+                ExcelSheet.init()
+                        .name("工作表1")
+                        .cells(
+                                new ExcelCell("測試資料1", 0, 0, style),
+                                new ExcelCell("測試資料2", 2, 0, style),
+                                new ExcelCell("測試資料3", 3, 0, style))
+                        .mergedRegions(
+                                ExcelMergedRegion.init(0, 1, 0, 0).border(BorderStyle.THIN).build())
+                        .freezePane(1, 0)
+                        .build();
         ExcelWriteBuilder excelWriteBuilder = EasyExcel.write().addSheet(sheet);
 
         // 測試輸出xls
@@ -68,11 +73,12 @@ public class EasyExcelTests {
     @Test
     public void testStreamWrite() throws ExcelException {
         try (ExcelStreamWriteBuilder writeBuilder = EasyExcel.writeStream()) {
-            ExcelStreamStyle style = new ExcelStreamStyle();
-            style.setAllBorder(BorderStyle.THIN);
-            style.setBackgroundColor(IndexedColors.LIGHT_YELLOW);
-            style.setFontColor(IndexedColors.DARK_BLUE);
-
+            ExcelStreamStyle style =
+                    ExcelStreamStyle.init()
+                            .border(BorderStyle.THIN, IndexedColors.BLACK)
+                            .backgroundColor(IndexedColors.LIGHT_YELLOW)
+                            .fontColor(IndexedColors.DARK_BLUE)
+                            .build();
             writeBuilder
                     .createSheet("sheet", "測試工作表")
                     .addCell("sheet", new ExcelStreamCell("測試資料1", 0, 0, style))

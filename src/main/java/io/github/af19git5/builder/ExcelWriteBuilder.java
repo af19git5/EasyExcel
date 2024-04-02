@@ -8,14 +8,13 @@ import io.github.af19git5.exception.ExcelException;
 import lombok.NonNull;
 
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.ss.util.RegionUtil;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 
+import java.awt.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -67,9 +66,26 @@ public class ExcelWriteBuilder {
     private HSSFWorkbook buildHSSFWorkbook() {
         // 新建工作簿
         HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFPalette palette = workbook.getCustomPalette();
         for (ExcelSheet sheet : sheetList) {
             // 建立工作表
             HSSFSheet hssfSheet = workbook.createSheet(sheet.getName());
+            // 處理表格欄位合併
+            for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
+                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
+                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
+                    // 欄位合併只有一格時略過處理
+                    continue;
+                }
+                CellRangeAddress cellAddresses =
+                        new CellRangeAddress(
+                                mergedRegion.getFirstRow(),
+                                mergedRegion.getLastRow(),
+                                mergedRegion.getFirstColumn(),
+                                mergedRegion.getLastColumn());
+                hssfSheet.addMergedRegion(cellAddresses);
+            }
+            // 處理欄位資料
             Map<Integer, HSSFRow> rowMap = new HashMap<>();
             for (ExcelCell cell : sheet.getCellList()) {
                 HSSFRow row;
@@ -102,50 +118,101 @@ public class ExcelWriteBuilder {
                 if (null != cell.getStyle()) {
                     hssfCell.setCellStyle(cell.getStyle().toHSSCellStyle(workbook));
                 }
-                if (!sheet.getHiddenRowNumList().contains(cell.getRow())
-                        || !sheet.getHiddenColumnNumList().contains(cell.getColumn())) {
-                    hssfSheet.autoSizeColumn(cell.getColumn(), true);
+                if (!sheet.getHiddenRowNumSet().contains(cell.getRow())
+                        || !sheet.getHiddenColumnNumSet().contains(cell.getColumn())) {
+                    hssfSheet.autoSizeColumn(cell.getColumn(), false);
                 }
             }
-            // 處理表格欄位合併
+            // 處理表格欄位合併邊線顏色
             for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
-                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
-                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
-                    // 欄位合併只有一格時略過處理
-                    continue;
-                }
-                CellRangeAddress cellAddresses =
-                        new CellRangeAddress(
-                                mergedRegion.getFirstRow(),
-                                mergedRegion.getLastRow(),
-                                mergedRegion.getFirstColumn(),
-                                mergedRegion.getLastColumn());
-                hssfSheet.addMergedRegionUnsafe(cellAddresses);
-                if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, hssfSheet);
-                }
-                if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderBottom(
-                            mergedRegion.getBorderBottom(), cellAddresses, hssfSheet);
-                }
-                if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderLeft(
-                            mergedRegion.getBorderLeft(), cellAddresses, hssfSheet);
-                }
-                if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderRight(
-                            mergedRegion.getBorderRight(), cellAddresses, hssfSheet);
+                HSSFCellStyle cellStyle = null;
+                for (int rowNum = mergedRegion.getFirstRow();
+                     rowNum <= mergedRegion.getLastRow();
+                     rowNum++) {
+                    HSSFRow hssfRow = hssfSheet.getRow(rowNum);
+                    if (null == hssfRow) {
+                        hssfRow = hssfSheet.createRow(rowNum);
+                    }
+                    for (int columnNum = mergedRegion.getFirstColumn();
+                         columnNum <= mergedRegion.getLastColumn();
+                         columnNum++) {
+                        HSSFCell hssfCell = hssfRow.getCell(columnNum);
+                        if (null == hssfCell) {
+                            hssfCell = hssfRow.createCell(columnNum);
+                        }
+                        if (rowNum == mergedRegion.getFirstRow()
+                                && columnNum == mergedRegion.getFirstColumn()) {
+                            cellStyle = hssfCell.getCellStyle();
+                            if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderTop(mergedRegion.getBorderTop());
+                                if (null != mergedRegion.getBorderTopColor()) {
+                                    Color rgbColor = Color.decode(mergedRegion.getBorderTopColor());
+                                    HSSFColor color =
+                                            palette.findSimilarColor(
+                                                    (byte) rgbColor.getRed(),
+                                                    (byte) rgbColor.getGreen(),
+                                                    (byte) rgbColor.getBlue());
+                                    cellStyle.setTopBorderColor(color.getIndex());
+                                }
+                            }
+                            if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderBottom(mergedRegion.getBorderBottom());
+                                if (null != mergedRegion.getBorderBottomColor()) {
+                                    Color rgbColor = Color.decode(mergedRegion.getBorderBottomColor());
+                                    HSSFColor color =
+                                            palette.findSimilarColor(
+                                                    (byte) rgbColor.getRed(),
+                                                    (byte) rgbColor.getGreen(),
+                                                    (byte) rgbColor.getBlue());
+                                    cellStyle.setBottomBorderColor(color.getIndex());
+                                }
+                            }
+                            if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderLeft(mergedRegion.getBorderLeft());
+                                if (null != mergedRegion.getBorderLeftColor()) {
+                                    Color rgbColor = Color.decode(mergedRegion.getBorderLeftColor());
+                                    HSSFColor color =
+                                            palette.findSimilarColor(
+                                                    (byte) rgbColor.getRed(),
+                                                    (byte) rgbColor.getGreen(),
+                                                    (byte) rgbColor.getBlue());
+                                    cellStyle.setLeftBorderColor(color.getIndex());
+                                }
+                            }
+                            if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderRight(mergedRegion.getBorderRight());
+                                if (null != mergedRegion.getBorderRightColor()) {
+                                    Color rgbColor = Color.decode(mergedRegion.getBorderRightColor());
+                                    HSSFColor color =
+                                            palette.findSimilarColor(
+                                                    (byte) rgbColor.getRed(),
+                                                    (byte) rgbColor.getGreen(),
+                                                    (byte) rgbColor.getBlue());
+                                    cellStyle.setRightBorderColor(color.getIndex());
+                                }
+                            }
+                        }
+                        if (null != cellStyle) {
+                            hssfCell.setCellStyle(cellStyle);
+                        }
+                    }
                 }
             }
             // 處理行列隱藏
-            for (Integer rowNum : sheet.getHiddenRowNumList()) {
+            for (Integer rowNum : sheet.getHiddenRowNumSet()) {
                 hssfSheet.getRow(rowNum).setZeroHeight(true);
             }
-            for (Integer columnNum : sheet.getHiddenColumnNumList()) {
+            for (Integer columnNum : sheet.getHiddenColumnNumSet()) {
                 hssfSheet.setColumnHidden(columnNum, true);
             }
             // 處理欄位覆寫寬度
             sheet.getOverrideColumnWidthMap().forEach(hssfSheet::setColumnWidth);
+            // 處理滾動凍結欄位
+            hssfSheet.createFreezePane(sheet.getFreezeColumnNum(), sheet.getFreezeRowNum());
+            // 保護資料表
+            if (sheet.getIsProtect()) {
+                hssfSheet.protectSheet(sheet.getPassword());
+            }
         }
         return workbook;
     }
@@ -161,6 +228,22 @@ public class ExcelWriteBuilder {
         for (ExcelSheet sheet : sheetList) {
             // 建立工作表
             XSSFSheet xssfSheet = workbook.createSheet(sheet.getName());
+            // 處理表格欄位合併
+            for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
+                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
+                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
+                    // 欄位合併只有一格時略過處理
+                    continue;
+                }
+                CellRangeAddress cellAddresses =
+                        new CellRangeAddress(
+                                mergedRegion.getFirstRow(),
+                                mergedRegion.getLastRow(),
+                                mergedRegion.getFirstColumn(),
+                                mergedRegion.getLastColumn());
+                xssfSheet.addMergedRegionUnsafe(cellAddresses);
+            }
+            // 處理欄位資料
             Map<Integer, XSSFRow> rowMap = new HashMap<>();
             for (ExcelCell cell : sheet.getCellList()) {
                 XSSFRow row;
@@ -193,50 +276,100 @@ public class ExcelWriteBuilder {
                 if (null != cell.getStyle()) {
                     xssfCell.setCellStyle(cell.getStyle().toXSSCellStyle(workbook));
                 }
-                if (!sheet.getHiddenRowNumList().contains(cell.getRow())
-                        || !sheet.getHiddenColumnNumList().contains(cell.getColumn())) {
-                    xssfSheet.autoSizeColumn(cell.getColumn(), true);
+                if (!sheet.getHiddenRowNumSet().contains(cell.getRow())
+                        || !sheet.getHiddenColumnNumSet().contains(cell.getColumn())) {
+                    xssfSheet.autoSizeColumn(cell.getColumn(), false);
                 }
             }
-            // 處理表格欄位合併
+            // 處理表格欄位合併邊線顏色
             for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
-                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
-                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
-                    // 欄位合併只有一格時略過處理
-                    continue;
-                }
-                CellRangeAddress cellAddresses =
-                        new CellRangeAddress(
-                                mergedRegion.getFirstRow(),
-                                mergedRegion.getLastRow(),
-                                mergedRegion.getFirstColumn(),
-                                mergedRegion.getLastColumn());
-                xssfSheet.addMergedRegionUnsafe(cellAddresses);
-                if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderTop(mergedRegion.getBorderTop(), cellAddresses, xssfSheet);
-                }
-                if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderBottom(
-                            mergedRegion.getBorderBottom(), cellAddresses, xssfSheet);
-                }
-                if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderLeft(
-                            mergedRegion.getBorderLeft(), cellAddresses, xssfSheet);
-                }
-                if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
-                    RegionUtil.setBorderRight(
-                            mergedRegion.getBorderRight(), cellAddresses, xssfSheet);
+                XSSFCellStyle cellStyle = null;
+                for (int rowNum = mergedRegion.getFirstRow();
+                        rowNum <= mergedRegion.getLastRow();
+                        rowNum++) {
+                    XSSFRow xssfRow = xssfSheet.getRow(rowNum);
+                    if (null == xssfRow) {
+                        xssfRow = xssfSheet.createRow(rowNum);
+                    }
+                    for (int columnNum = mergedRegion.getFirstColumn();
+                            columnNum <= mergedRegion.getLastColumn();
+                            columnNum++) {
+                        XSSFCell xssfCell = xssfRow.getCell(columnNum);
+                        if (null == xssfCell) {
+                            xssfCell = xssfRow.createCell(columnNum);
+                        }
+                        if (rowNum == mergedRegion.getFirstRow()
+                                && columnNum == mergedRegion.getFirstColumn()) {
+                            cellStyle = xssfCell.getCellStyle();
+                            if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderTop(mergedRegion.getBorderTop());
+                                if (null != mergedRegion.getBorderTopColor()) {
+                                    XSSFColor color =
+                                            XSSFColor.from(
+                                                    CTColor.Factory.newInstance(),
+                                                    new DefaultIndexedColorMap());
+                                    color.setARGBHex(mergedRegion.getBorderTopColor().substring(1));
+                                    cellStyle.setTopBorderColor(color);
+                                }
+                            }
+                            if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderBottom(mergedRegion.getBorderBottom());
+                                if (null != mergedRegion.getBorderBottomColor()) {
+                                    XSSFColor color =
+                                            XSSFColor.from(
+                                                    CTColor.Factory.newInstance(),
+                                                    new DefaultIndexedColorMap());
+                                    color.setARGBHex(
+                                            mergedRegion.getBorderBottomColor().substring(1));
+                                    cellStyle.setBottomBorderColor(color);
+                                }
+                            }
+                            if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderLeft(mergedRegion.getBorderLeft());
+                                if (null != mergedRegion.getBorderLeftColor()) {
+                                    XSSFColor color =
+                                            XSSFColor.from(
+                                                    CTColor.Factory.newInstance(),
+                                                    new DefaultIndexedColorMap());
+                                    color.setARGBHex(
+                                            mergedRegion.getBorderLeftColor().substring(1));
+                                    cellStyle.setLeftBorderColor(color);
+                                }
+                            }
+                            if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
+                                cellStyle.setBorderRight(mergedRegion.getBorderRight());
+                                if (null != mergedRegion.getBorderRightColor()) {
+                                    XSSFColor color =
+                                            XSSFColor.from(
+                                                    CTColor.Factory.newInstance(),
+                                                    new DefaultIndexedColorMap());
+                                    color.setARGBHex(
+                                            mergedRegion.getBorderRightColor().substring(1));
+                                    cellStyle.setRightBorderColor(color);
+                                }
+                            }
+                        }
+                        if (null != cellStyle) {
+                            xssfCell.setCellStyle(cellStyle);
+                        }
+                    }
                 }
             }
             // 處理行列隱藏
-            for (Integer rowNum : sheet.getHiddenRowNumList()) {
+            for (Integer rowNum : sheet.getHiddenRowNumSet()) {
                 xssfSheet.getRow(rowNum).setZeroHeight(true);
             }
-            for (Integer columnNum : sheet.getHiddenColumnNumList()) {
+            for (Integer columnNum : sheet.getHiddenColumnNumSet()) {
                 xssfSheet.setColumnHidden(columnNum, true);
             }
             // 處理欄位覆寫寬度
             sheet.getOverrideColumnWidthMap().forEach(xssfSheet::setColumnWidth);
+            // 處理滾動凍結欄位
+            xssfSheet.createFreezePane(sheet.getFreezeColumnNum(), sheet.getFreezeRowNum());
+            // 保護資料表
+            if (sheet.getIsProtect()) {
+                xssfSheet.protectSheet(sheet.getPassword());
+            }
         }
         return workbook;
     }
@@ -263,7 +396,7 @@ public class ExcelWriteBuilder {
      *
      * @param filePath 儲存檔案位置
      */
-    public void outputXls(String filePath) throws ExcelException {
+    public void outputXls(@NonNull String filePath) throws ExcelException {
         outputXls(new File(filePath));
     }
 
@@ -272,7 +405,7 @@ public class ExcelWriteBuilder {
      *
      * @param file 儲存檔案
      */
-    public void outputXls(File file) throws ExcelException {
+    public void outputXls(@NonNull File file) throws ExcelException {
         try (HSSFWorkbook workbook = buildHSSFWorkbook();
                 FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
@@ -303,7 +436,7 @@ public class ExcelWriteBuilder {
      *
      * @param filePath 儲存檔案位置
      */
-    public void outputXlsx(String filePath) throws ExcelException {
+    public void outputXlsx(@NonNull String filePath) throws ExcelException {
         outputXlsx(new File(filePath));
     }
 
@@ -312,7 +445,7 @@ public class ExcelWriteBuilder {
      *
      * @param file 儲存檔案
      */
-    public void outputXlsx(File file) throws ExcelException {
+    public void outputXlsx(@NonNull File file) throws ExcelException {
         try (XSSFWorkbook workbook = buildXSSFWorkbook();
                 FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);

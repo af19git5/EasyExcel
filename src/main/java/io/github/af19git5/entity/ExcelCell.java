@@ -1,5 +1,7 @@
 package io.github.af19git5.entity;
 
+import io.github.af19git5.builder.ExcelCellBuilder;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,7 +21,7 @@ public class ExcelCell {
     private String value;
 
     /** 欄位類別 */
-    public CellType cellType = CellType.STRING;
+    private CellType cellType = CellType.STRING;
 
     /** 橫列(從0開始) */
     private Integer row;
@@ -104,5 +106,15 @@ public class ExcelCell {
         this.column = column;
         this.cellType = cellType;
         this.style = style;
+    }
+
+    public static ExcelCellBuilder init(
+            String value, @NonNull Integer row, @NonNull Integer column) {
+        return new ExcelCellBuilder(row, column, value);
+    }
+
+    public static ExcelCellBuilder init(
+            @NonNull Integer row, @NonNull Integer column, String value) {
+        return new ExcelCellBuilder(row, column, value);
     }
 }

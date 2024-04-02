@@ -14,7 +14,7 @@ Add this in your pom.xml dependencies.
 <dependency>
   <groupId>io.github.af19git5</groupId>
   <artifactId>easy-excel</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
 </dependency>
 ```
 
@@ -39,14 +39,20 @@ List<ExcelSheet> sheetList = EasyExcel.read(file);
 ### Writing Example
 
 ```java
-ExcelStyle style = new ExcelStyle();
-style.setAllBorder(BorderStyle.THIN);
-style.setBackgroundColor("#FFF0AC");
-style.setFontColor("#000079");
+ExcelStyle style =
+        ExcelStyle.init()
+                .border(BorderStyle.THIN, "#FFF0AC")
+                .fontColor("#000079")
+                .build();
 
-ExcelSheet sheet = new ExcelSheet("工作表1", new ArrayList<>());
-sheet.getCellList().add(new ExcelCell("測試資料1", 0, 0, style));
-sheet.getCellList().add(new ExcelCell("測試資料2", 1, 0, style));
+ExcelSheet sheet =
+        ExcelSheet.init()
+                .name("Shee1")
+                .cells(
+                        new ExcelCell("Test Data 1", 0, 0, style),
+                        new ExcelCell("Test Data 2", 1, 0, style)
+                )
+                .build();
 
 ExcelWriteBuilder excelWriteBuilder = EasyExcel.write().addSheet(sheet);
 
@@ -63,18 +69,20 @@ The `flush` method is called in the example to save the batch of added column da
 
 ```java
 try (ExcelStreamWriteBuilder writeBuilder = EasyExcel.writeStream()) {
-    ExcelStreamStyle style = new ExcelStreamStyle();
-    style.setAllBorder(BorderStyle.THIN);
-    style.setBackgroundColor(IndexedColors.LIGHT_YELLOW);
-    style.setFontColor(IndexedColors.DARK_BLUE);
+    ExcelStreamStyle style =
+            ExcelStreamStyle.init()
+                    .border(BorderStyle.THIN, IndexedColors.BLACK)
+                    .backgroundColor(IndexedColors.LIGHT_YELLOW)
+                    .fontColor(IndexedColors.DARK_BLUE)
+                    .build();
 
     writeBuilder
-        .createSheet("sheet", "Test Sheet")
-        .addCell("sheet", new ExcelStreamCell("Test Data 1", 0, 0, style))
-        .flush("sheet")
-        .addCell("sheet", new ExcelStreamCell("Test Data 2", 1, 0, style))
-        .flush("sheet")
-        .outputXlsx("Your output path.");
+            .createSheet("sheet", "Test Sheet")
+            .addCell("sheet", new ExcelStreamCell("Test Data 1", 0, 0, style))
+            .flush("sheet")
+            .addCell("sheet", new ExcelStreamCell("Test Data 2", 1, 0, style))
+            .flush("sheet")
+            .outputXlsx("Your output path.");
 }
 ```
 

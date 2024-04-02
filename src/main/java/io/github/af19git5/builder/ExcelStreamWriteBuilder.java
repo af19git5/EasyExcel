@@ -3,6 +3,8 @@ package io.github.af19git5.builder;
 import io.github.af19git5.entity.ExcelStreamCell;
 import io.github.af19git5.exception.ExcelException;
 
+import lombok.NonNull;
+
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -12,12 +14,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * excel寫出建構器(資料流輸出)
@@ -43,7 +40,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @param name 工作表名稱
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder createSheet(String sheetCode, String name) {
+    public ExcelStreamWriteBuilder createSheet(@NonNull String sheetCode, @NonNull String name) {
         sheetMap.put(sheetCode, workbook.createSheet(name));
         cellMap.put(sheetCode, new ArrayList<>());
         return this;
@@ -57,7 +54,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @return 原方法
      */
     public ExcelStreamWriteBuilder addCellRangeAddress(
-            String sheetCode, CellRangeAddress... cellRangeAddresses) {
+            @NonNull String sheetCode, @NonNull CellRangeAddress... cellRangeAddresses) {
         SXSSFSheet sheet = sheetMap.get(sheetCode);
         if (null == sheet) {
             return this;
@@ -76,9 +73,59 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @return 原方法
      */
     public ExcelStreamWriteBuilder addCellRangeAddress(
-            String sheetCode, List<CellRangeAddress> cellRangeAddressList) {
+            @NonNull String sheetCode, @NonNull List<CellRangeAddress> cellRangeAddressList) {
         return addCellRangeAddress(
                 sheetCode, cellRangeAddressList.toArray(new CellRangeAddress[0]));
+    }
+
+    /**
+     * 增加隱藏列
+     *
+     * @param sheetCode 工作表代碼
+     * @param hiddenRowNum 隱藏列
+     * @return 原方法
+     */
+    public ExcelStreamWriteBuilder addHiddenRowNum(@NonNull String sheetCode, int hiddenRowNum) {
+        SXSSFSheet sheet = sheetMap.get(sheetCode);
+        if (null == sheet) {
+            return this;
+        }
+        sheet.getRow(hiddenRowNum).setZeroHeight(true);
+        return this;
+    }
+
+    /**
+     * 增加隱藏行
+     *
+     * @param sheetCode 工作表代碼
+     * @param hiddenColumnNum 隱藏行
+     * @return 原方法
+     */
+    public ExcelStreamWriteBuilder addHiddenColumnNum(
+            @NonNull String sheetCode, int hiddenColumnNum) {
+        SXSSFSheet sheet = sheetMap.get(sheetCode);
+        if (null == sheet) {
+            return this;
+        }
+        sheet.setColumnHidden(hiddenColumnNum, true);
+        return this;
+    }
+
+    /**
+     * 保護工作表
+     *
+     * @param sheetCode 工作表代碼
+     * @param password 密碼
+     * @return 原方法
+     */
+    public ExcelStreamWriteBuilder protectSheet(
+            @NonNull String sheetCode, @NonNull String password) {
+        SXSSFSheet sheet = sheetMap.get(sheetCode);
+        if (null == sheet) {
+            return this;
+        }
+        sheet.protectSheet(password);
+        return this;
     }
 
     /**
@@ -88,7 +135,8 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @param cells 欄位資料
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addCell(String sheetCode, ExcelStreamCell... cells) {
+    public ExcelStreamWriteBuilder addCell(
+            @NonNull String sheetCode, @NonNull ExcelStreamCell... cells) {
         List<ExcelStreamCell> cellList = cellMap.get(sheetCode);
         if (cellList == null) {
             return this;
@@ -104,7 +152,8 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @param cellList 欄位資料
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addCell(String sheetCode, List<ExcelStreamCell> cellList) {
+    public ExcelStreamWriteBuilder addCell(
+            @NonNull String sheetCode, @NonNull List<ExcelStreamCell> cellList) {
         return addCell(sheetCode, cellList.toArray(new ExcelStreamCell[0]));
     }
 
@@ -113,7 +162,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      *
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder flush(String sheetCode) throws ExcelException {
+    public ExcelStreamWriteBuilder flush(@NonNull String sheetCode) throws ExcelException {
         SXSSFSheet sheet = sheetMap.get(sheetCode);
         if (null == sheet) {
             return this;
@@ -169,7 +218,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      *
      * @param filePath 儲存檔案位置
      */
-    public void outputXlsx(String filePath) throws ExcelException {
+    public void outputXlsx(@NonNull String filePath) throws ExcelException {
         outputXlsx(new File(filePath));
     }
 
@@ -178,7 +227,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      *
      * @param file 儲存檔案
      */
-    public void outputXlsx(File file) throws ExcelException {
+    public void outputXlsx(@NonNull File file) throws ExcelException {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
         } catch (IOException e) {

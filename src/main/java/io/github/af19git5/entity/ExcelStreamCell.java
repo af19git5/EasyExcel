@@ -1,5 +1,7 @@
 package io.github.af19git5.entity;
 
+import io.github.af19git5.builder.ExcelStreamCellBuilder;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -30,49 +32,46 @@ public class ExcelStreamCell {
     /** 欄位樣式 */
     private ExcelStreamStyle style;
 
-    public ExcelStreamCell(@NonNull String value, @NonNull Integer row, @NonNull Integer column) {
-        this.value = value;
+    public ExcelStreamCell(String value, @NonNull Integer row, @NonNull Integer column) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
     }
 
     public ExcelStreamCell(
-            @NonNull String value,
+            String value,
             @NonNull Integer row,
             @NonNull Integer column,
             @NonNull CellType cellType) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
     }
 
     public ExcelStreamCell(
-            @NonNull String value,
-            @NonNull Integer row,
-            @NonNull Integer column,
-            ExcelStreamStyle style) {
-        this.value = value;
+            String value, @NonNull Integer row, @NonNull Integer column, ExcelStreamStyle style) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.style = style;
     }
 
     public ExcelStreamCell(
-            @NonNull String value,
+            String value,
             @NonNull Integer row,
             @NonNull Integer column,
             @NonNull CellType cellType,
             ExcelStreamStyle style) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
         this.style = style;
     }
 
-    public ExcelStreamCell(@NonNull Integer row, @NonNull Integer column, @NonNull String value) {
-        this.value = value;
+    public ExcelStreamCell(@NonNull Integer row, @NonNull Integer column, String value) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
     }
@@ -80,20 +79,17 @@ public class ExcelStreamCell {
     public ExcelStreamCell(
             @NonNull Integer row,
             @NonNull Integer column,
-            @NonNull String value,
+            String value,
             @NonNull CellType cellType) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
     }
 
     public ExcelStreamCell(
-            @NonNull Integer row,
-            @NonNull Integer column,
-            @NonNull String value,
-            ExcelStreamStyle style) {
-        this.value = value;
+            @NonNull Integer row, @NonNull Integer column, String value, ExcelStreamStyle style) {
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.style = style;
@@ -102,13 +98,23 @@ public class ExcelStreamCell {
     public ExcelStreamCell(
             @NonNull Integer row,
             @NonNull Integer column,
-            @NonNull String value,
+            String value,
             @NonNull CellType cellType,
             ExcelStreamStyle style) {
-        this.value = value;
+        this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
         this.cellType = cellType;
         this.style = style;
+    }
+
+    public static ExcelStreamCellBuilder init(
+            String value, @NonNull Integer row, @NonNull Integer column) {
+        return new ExcelStreamCellBuilder(row, column, value);
+    }
+
+    public static ExcelStreamCellBuilder init(
+            @NonNull Integer row, @NonNull Integer column, String value) {
+        return new ExcelStreamCellBuilder(row, column, value);
     }
 }

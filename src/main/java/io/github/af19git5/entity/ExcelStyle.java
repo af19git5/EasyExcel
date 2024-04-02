@@ -1,6 +1,9 @@
 package io.github.af19git5.entity;
 
+import io.github.af19git5.builder.ExcelStyleBuilder;
+
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
@@ -24,90 +27,97 @@ import java.awt.Color;
 public class ExcelStyle {
 
     /** 是否自動換行 */
-    private Boolean isWrapText = false;
+    @NonNull private Boolean isWrapText = false;
+
+    /** 是否鎖定 */
+    @NonNull private Boolean isLock = false;
 
     /** 上邊線樣式 */
-    private BorderStyle borderTop = BorderStyle.NONE;
+    @NonNull private BorderStyle borderTop = BorderStyle.NONE;
 
     /** 下邊線樣式 */
-    private BorderStyle borderBottom = BorderStyle.NONE;
+    @NonNull private BorderStyle borderBottom = BorderStyle.NONE;
 
     /** 左邊線樣式 */
-    private BorderStyle borderLeft = BorderStyle.NONE;
+    @NonNull private BorderStyle borderLeft = BorderStyle.NONE;
 
     /** 右邊線樣式 */
-    private BorderStyle borderRight = BorderStyle.NONE;
+    @NonNull private BorderStyle borderRight = BorderStyle.NONE;
 
     /** 上邊線顏色 */
-    public String borderTopColor;
+    private String borderTopColor;
 
     /** 下邊線顏色 */
-    public String borderBottomColor;
+    private String borderBottomColor;
 
     /** 左邊線顏色 */
-    public String borderLeftColor;
+    private String borderLeftColor;
 
     /** 右邊線顏色 */
-    public String borderRightColor;
+    private String borderRightColor;
 
     /** 水平對齊位置 */
-    public HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
+    @NonNull private HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
 
     /** 垂直對齊位置 */
-    public VerticalAlignment verticalAlignment = VerticalAlignment.TOP;
+    @NonNull private VerticalAlignment verticalAlignment = VerticalAlignment.TOP;
 
     /** 背景顏色 */
-    public String backgroundColor;
+    private String backgroundColor;
 
     /** 文字字體 */
-    public String fontName;
+    private String fontName;
 
     /** 文字大小 */
-    public Integer fontSize = 10;
-
-    /** 是否為粗體 */
-    public Boolean bold = false;
-
-    /** 是否為斜體 */
-    public Boolean italic = false;
-
-    /** 是否加入刪除線 */
-    public Boolean strikeout = false;
+    @NonNull private Integer fontSize = 10;
 
     /** 文字顏色 */
-    public String fontColor;
+    private String fontColor;
 
-    public void setBorderTopColor(String colorHex) {
+    /** 是否為粗體 */
+    @NonNull private Boolean bold = false;
+
+    /** 是否為斜體 */
+    @NonNull private Boolean italic = false;
+
+    /** 是否加入刪除線 */
+    @NonNull private Boolean strikeout = false;
+
+    public static ExcelStyleBuilder init() {
+        return new ExcelStyleBuilder();
+    }
+
+    public void setBorderTopColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.borderTopColor = colorHex;
         }
     }
 
-    public void setBorderBottomColor(String colorHex) {
+    public void setBorderBottomColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.borderBottomColor = colorHex;
         }
     }
 
-    public void setBorderLeftColor(String colorHex) {
+    public void setBorderLeftColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.borderLeftColor = colorHex;
         }
     }
 
-    public void setBorderRightColor(String colorHex) {
+    public void setBorderRightColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.borderRightColor = colorHex;
         }
     }
 
-    public void setBackgroundColor(String colorHex) {
+    public void setBackgroundColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.backgroundColor = colorHex;
         }
     }
 
-    public void setFontColor(String colorHex) {
+    public void setFontColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.fontColor = colorHex;
         }
@@ -119,18 +129,18 @@ public class ExcelStyle {
      * @param colorHex 16進位色碼
      * @return 是否符合格式
      */
-    private boolean isValidColorHex(String colorHex) {
+    private boolean isValidColorHex(@NonNull String colorHex) {
         return colorHex.matches("^#(?:[0-9a-fA-F]{3}){1,2}$");
     }
 
-    public void setAllBorder(BorderStyle borderStyle) {
+    public void setAllBorder(@NonNull BorderStyle borderStyle) {
         this.borderTop = borderStyle;
         this.borderBottom = borderStyle;
         this.borderLeft = borderStyle;
         this.borderRight = borderStyle;
     }
 
-    public void setAllBorderColor(String colorHex) {
+    public void setAllBorderColor(@NonNull String colorHex) {
         if (isValidColorHex(colorHex)) {
             this.borderTopColor = colorHex;
             this.borderBottomColor = colorHex;
@@ -141,9 +151,10 @@ public class ExcelStyle {
 
     public ExcelStyle() {}
 
-    public ExcelStyle(HSSFWorkbook workbook, HSSFCellStyle cellStyle) {
+    public ExcelStyle(@NonNull HSSFWorkbook workbook, @NonNull HSSFCellStyle cellStyle) {
         HSSFPalette palette = workbook.getCustomPalette();
         this.isWrapText = cellStyle.getWrapText();
+        this.isLock = cellStyle.getLocked();
         this.borderTop = cellStyle.getBorderTop();
         this.borderBottom = cellStyle.getBorderBottom();
         this.borderLeft = cellStyle.getBorderLeft();
@@ -184,8 +195,9 @@ public class ExcelStyle {
         }
     }
 
-    public ExcelStyle(XSSFCellStyle cellStyle) {
+    public ExcelStyle(@NonNull XSSFCellStyle cellStyle) {
         this.isWrapText = cellStyle.getWrapText();
+        this.isLock = cellStyle.getLocked();
         this.borderTop = cellStyle.getBorderTop();
         this.borderBottom = cellStyle.getBorderBottom();
         this.borderLeft = cellStyle.getBorderLeft();
@@ -212,9 +224,10 @@ public class ExcelStyle {
         return "#" + color.getARGBHex().substring(2);
     }
 
-    public HSSFCellStyle toHSSCellStyle(HSSFWorkbook workbook) {
+    public HSSFCellStyle toHSSCellStyle(@NonNull HSSFWorkbook workbook) {
         HSSFPalette palette = workbook.getCustomPalette();
         HSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setLocked(this.isLock);
         cellStyle.setWrapText(this.isWrapText);
         cellStyle.setBorderTop(this.borderTop);
         cellStyle.setBorderBottom(this.borderBottom);
@@ -295,8 +308,9 @@ public class ExcelStyle {
         return cellStyle;
     }
 
-    public CellStyle toXSSCellStyle(XSSFWorkbook workbook) {
+    public CellStyle toXSSCellStyle(@NonNull XSSFWorkbook workbook) {
         XSSFCellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setLocked(this.isLock);
         cellStyle.setWrapText(this.isWrapText);
         cellStyle.setBorderTop(this.borderTop);
         cellStyle.setBorderBottom(this.borderBottom);

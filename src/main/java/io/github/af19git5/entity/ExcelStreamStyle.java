@@ -1,7 +1,9 @@
 package io.github.af19git5.entity;
 
+import io.github.af19git5.builder.ExcelStreamStyleBuilder;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import org.apache.poi.ss.usermodel.*;
@@ -15,56 +17,65 @@ import org.apache.poi.ss.usermodel.*;
 @Setter
 public class ExcelStreamStyle {
 
+    /** 是否自動換行 */
+    @NonNull private Boolean isWrapText = false;
+
+    @NonNull private Boolean isLock = false;
+
     /** 上邊線樣式 */
-    private BorderStyle borderTop = BorderStyle.NONE;
+    @NonNull private BorderStyle borderTop = BorderStyle.NONE;
 
     /** 下邊線樣式 */
-    private BorderStyle borderBottom = BorderStyle.NONE;
+    @NonNull private BorderStyle borderBottom = BorderStyle.NONE;
 
     /** 左邊線樣式 */
-    private BorderStyle borderLeft = BorderStyle.NONE;
+    @NonNull private BorderStyle borderLeft = BorderStyle.NONE;
 
     /** 右邊線樣式 */
-    private BorderStyle borderRight = BorderStyle.NONE;
+    @NonNull private BorderStyle borderRight = BorderStyle.NONE;
 
     /** 上邊線顏色 */
-    public IndexedColors borderTopColor;
+    private IndexedColors borderTopColor;
 
     /** 下邊線顏色 */
-    public IndexedColors borderBottomColor;
+    private IndexedColors borderBottomColor;
 
     /** 左邊線顏色 */
-    public IndexedColors borderLeftColor;
+    private IndexedColors borderLeftColor;
 
     /** 右邊線顏色 */
-    public IndexedColors borderRightColor;
+    private IndexedColors borderRightColor;
 
     /** 水平對齊位置 */
-    public HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
+    @NonNull private HorizontalAlignment horizontalAlignment = HorizontalAlignment.LEFT;
 
     /** 垂直對齊位置 */
-    public VerticalAlignment verticalAlignment = VerticalAlignment.TOP;
+    @NonNull private VerticalAlignment verticalAlignment = VerticalAlignment.TOP;
 
     /** 背景顏色 */
-    public IndexedColors backgroundColor;
+    private IndexedColors backgroundColor;
 
     /** 文字字體 */
-    public String fontName;
+    private String fontName;
 
     /** 文字大小 */
-    public Integer fontSize = 10;
-
-    /** 是否為粗體 */
-    public Boolean bold = false;
-
-    /** 是否為斜體 */
-    public Boolean italic = false;
-
-    /** 是否加入刪除線 */
-    public Boolean strikeout = false;
+    @NonNull private Integer fontSize = 10;
 
     /** 文字顏色 */
-    public IndexedColors fontColor;
+    private IndexedColors fontColor;
+
+    /** 是否為粗體 */
+    @NonNull private Boolean bold = false;
+
+    /** 是否為斜體 */
+    @NonNull private Boolean italic = false;
+
+    /** 是否加入刪除線 */
+    @NonNull private Boolean strikeout = false;
+
+    public static ExcelStreamStyleBuilder init() {
+        return new ExcelStreamStyleBuilder();
+    }
 
     public void setAllBorder(BorderStyle borderStyle) {
         this.borderTop = borderStyle;
@@ -80,10 +91,10 @@ public class ExcelStreamStyle {
         this.borderRightColor = indexedColor;
     }
 
-    public ExcelStreamStyle() {}
-
     public CellStyle toCellStyle(Workbook workbook) {
         CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setWrapText(this.isWrapText);
+        cellStyle.setLocked(this.isLock);
         cellStyle.setBorderTop(this.borderTop);
         cellStyle.setBorderBottom(this.borderBottom);
         cellStyle.setBorderLeft(this.borderLeft);

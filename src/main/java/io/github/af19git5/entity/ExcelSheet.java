@@ -1,6 +1,9 @@
 package io.github.af19git5.entity;
 
+import io.github.af19git5.builder.ExcelSheetBuilder;
+
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.*;
@@ -14,42 +17,67 @@ import java.util.*;
 public class ExcelSheet {
 
     /** 工作表名稱 */
-    @Setter private String name = "";
+    @Setter @NonNull private String name = "";
 
     /** 欄位資料 */
-    @Setter private List<ExcelCell> cellList = new ArrayList<>();
+    @Setter @NonNull private List<ExcelCell> cellList = new ArrayList<>();
 
     /** 合併欄位規則 */
-    @Setter private List<ExcelMergedRegion> mergedRegionList = new ArrayList<>();
+    @Setter @NonNull private List<ExcelMergedRegion> mergedRegionList = new ArrayList<>();
 
     /** 隱藏列數 */
-    @Setter private Set<Integer> hiddenRowNumList = new HashSet<>();
+    @Setter @NonNull private Set<Integer> hiddenRowNumSet = new HashSet<>();
 
     /** 隱藏欄數 */
-    @Setter private Set<Integer> hiddenColumnNumList = new HashSet<>();
+    @Setter @NonNull private Set<Integer> hiddenColumnNumSet = new HashSet<>();
+
+    /** 是否被保護 */
+    private Boolean isProtect = false;
+
+    /** 密碼 */
+    private String password = "";
+
+    /** 凍結行數 */
+    private Integer freezeColumnNum = 0;
+
+    /** 凍結列數 */
+    private Integer freezeRowNum = 0;
 
     /** 覆寫欄位寬度Map */
     private final Map<Integer, Integer> overrideColumnWidthMap = new HashMap<>();
 
     public ExcelSheet() {}
 
-    public ExcelSheet(String name, List<ExcelCell> cellList) {
+    public ExcelSheet(@NonNull String name, @NonNull List<ExcelCell> cellList) {
         this.name = name;
         this.cellList = cellList;
     }
 
+    public static ExcelSheetBuilder init() {
+        return new ExcelSheetBuilder();
+    }
+
     public void addHiddenRowNum(int hiddenRowNum) {
-        this.hiddenRowNumList.add(hiddenRowNum);
+        this.hiddenRowNumSet.add(hiddenRowNum);
     }
 
     public void addHiddenColumnNum(int hiddenColumnNum) {
-        this.hiddenColumnNumList.add(hiddenColumnNum);
+        this.hiddenColumnNumSet.add(hiddenColumnNum);
     }
 
     public void addOverrideColumnWidth(int columnNum, int width) {
         this.overrideColumnWidthMap.put(columnNum, width);
     }
 
+    public void protect(@NonNull String password) {
+        this.isProtect = true;
+        this.password = password;
+    }
+
+    public void freezePane(int columnNum, int rowNum) {
+        this.freezeColumnNum = columnNum;
+        this.freezeRowNum = rowNum;
+    }
     /**
      * 將cell陣列資料轉為二維資料陣列(逐列讀出)
      *
