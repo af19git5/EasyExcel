@@ -1,10 +1,12 @@
 package io.github.af19git5.builder;
 
 import io.github.af19git5.entity.ExcelStreamCell;
+import io.github.af19git5.entity.ExcelStreamStyle;
 import io.github.af19git5.exception.ExcelException;
 
 import lombok.NonNull;
 
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
 import org.apache.poi.xssf.streaming.SXSSFRow;
@@ -26,6 +28,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     private final SXSSFWorkbook workbook;
     private final Map<String, SXSSFSheet> sheetMap;
     private final Map<String, List<ExcelStreamCell>> cellMap;
+    private final Map<ExcelStreamStyle, CellStyle> cellStyleMap = new HashMap<>();
 
     public ExcelStreamWriteBuilder() {
         workbook = new SXSSFWorkbook();
@@ -201,7 +204,12 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
                     break;
             }
             if (null != cell.getStyle()) {
-                sxssfCell.setCellStyle(cell.getStyle().toCellStyle(workbook));
+                CellStyle cellStyle = cellStyleMap.get(cell.getStyle());
+                if (null == cellStyle) {
+                    cellStyle = cell.getStyle().toCellStyle(workbook);
+                    cellStyleMap.put(cell.getStyle(), cellStyle);
+                }
+                sxssfCell.setCellStyle(cellStyle);
             }
         }
         try {

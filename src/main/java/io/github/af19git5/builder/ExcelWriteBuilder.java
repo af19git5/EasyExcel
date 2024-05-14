@@ -3,6 +3,7 @@ package io.github.af19git5.builder;
 import io.github.af19git5.entity.ExcelCell;
 import io.github.af19git5.entity.ExcelMergedRegion;
 import io.github.af19git5.entity.ExcelSheet;
+import io.github.af19git5.entity.ExcelStyle;
 import io.github.af19git5.exception.ExcelException;
 
 import lombok.NonNull;
@@ -33,6 +34,9 @@ import java.util.Map;
 public class ExcelWriteBuilder {
 
     private final List<ExcelSheet> sheetList;
+
+    private final Map<ExcelStyle, HSSFCellStyle> hssfCellStyleMap = new HashMap<>();
+    private final Map<ExcelStyle, XSSFCellStyle> xssfCellStyleMap = new HashMap<>();
 
     public ExcelWriteBuilder() {
         this.sheetList = new ArrayList<>();
@@ -87,6 +91,7 @@ public class ExcelWriteBuilder {
             }
             // 處理欄位資料
             Map<Integer, HSSFRow> rowMap = new HashMap<>();
+            int maxColumnNum = 0;
             for (ExcelCell cell : sheet.getCellList()) {
                 HSSFRow row;
                 if (null == rowMap.get(cell.getRow())) {
@@ -95,6 +100,7 @@ public class ExcelWriteBuilder {
                 } else {
                     row = rowMap.get(cell.getRow());
                 }
+                maxColumnNum = Math.max(maxColumnNum, cell.getColumn());
                 HSSFCell hssfCell = row.createCell(cell.getColumn());
                 switch (cell.getCellType()) {
                     case FORMULA:
@@ -116,33 +122,35 @@ public class ExcelWriteBuilder {
                         break;
                 }
                 if (null != cell.getStyle()) {
-                    hssfCell.setCellStyle(cell.getStyle().toHSSCellStyle(workbook));
-                }
-                if (!sheet.getHiddenRowNumSet().contains(cell.getRow())
-                        || !sheet.getHiddenColumnNumSet().contains(cell.getColumn())) {
-                    hssfSheet.autoSizeColumn(cell.getColumn(), false);
+                    HSSFCellStyle hssfCellStyle = hssfCellStyleMap.get(cell.getStyle());
+                    if (null == hssfCellStyle) {
+                        hssfCellStyle = cell.getStyle().toHSSCellStyle(workbook);
+                        hssfCellStyleMap.put(cell.getStyle(), hssfCellStyle);
+                    }
+                    hssfCell.setCellStyle(hssfCellStyle);
                 }
             }
             // 處理表格欄位合併邊線顏色
             for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
                 HSSFCellStyle cellStyle = null;
                 for (int rowNum = mergedRegion.getFirstRow();
-                     rowNum <= mergedRegion.getLastRow();
-                     rowNum++) {
+                        rowNum <= mergedRegion.getLastRow();
+                        rowNum++) {
                     HSSFRow hssfRow = hssfSheet.getRow(rowNum);
                     if (null == hssfRow) {
                         hssfRow = hssfSheet.createRow(rowNum);
                     }
                     for (int columnNum = mergedRegion.getFirstColumn();
-                         columnNum <= mergedRegion.getLastColumn();
-                         columnNum++) {
+                            columnNum <= mergedRegion.getLastColumn();
+                            columnNum++) {
                         HSSFCell hssfCell = hssfRow.getCell(columnNum);
                         if (null == hssfCell) {
                             hssfCell = hssfRow.createCell(columnNum);
                         }
                         if (rowNum == mergedRegion.getFirstRow()
                                 && columnNum == mergedRegion.getFirstColumn()) {
-                            cellStyle = hssfCell.getCellStyle();
+                            cellStyle = workbook.createCellStyle();
+                            cellStyle.cloneStyleFrom(hssfCell.getCellStyle());
                             if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
                                 cellStyle.setBorderTop(mergedRegion.getBorderTop());
                                 if (null != mergedRegion.getBorderTopColor()) {
@@ -158,7 +166,8 @@ public class ExcelWriteBuilder {
                             if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
                                 cellStyle.setBorderBottom(mergedRegion.getBorderBottom());
                                 if (null != mergedRegion.getBorderBottomColor()) {
-                                    Color rgbColor = Color.decode(mergedRegion.getBorderBottomColor());
+                                    Color rgbColor =
+                                            Color.decode(mergedRegion.getBorderBottomColor());
                                     HSSFColor color =
                                             palette.findSimilarColor(
                                                     (byte) rgbColor.getRed(),
@@ -170,7 +179,8 @@ public class ExcelWriteBuilder {
                             if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
                                 cellStyle.setBorderLeft(mergedRegion.getBorderLeft());
                                 if (null != mergedRegion.getBorderLeftColor()) {
-                                    Color rgbColor = Color.decode(mergedRegion.getBorderLeftColor());
+                                    Color rgbColor =
+                                            Color.decode(mergedRegion.getBorderLeftColor());
                                     HSSFColor color =
                                             palette.findSimilarColor(
                                                     (byte) rgbColor.getRed(),
@@ -182,7 +192,8 @@ public class ExcelWriteBuilder {
                             if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
                                 cellStyle.setBorderRight(mergedRegion.getBorderRight());
                                 if (null != mergedRegion.getBorderRightColor()) {
-                                    Color rgbColor = Color.decode(mergedRegion.getBorderRightColor());
+                                    Color rgbColor =
+                                            Color.decode(mergedRegion.getBorderRightColor());
                                     HSSFColor color =
                                             palette.findSimilarColor(
                                                     (byte) rgbColor.getRed(),
@@ -204,6 +215,10 @@ public class ExcelWriteBuilder {
             }
             for (Integer columnNum : sheet.getHiddenColumnNumSet()) {
                 hssfSheet.setColumnHidden(columnNum, true);
+            }
+            // 處理自動適應寬度
+            for (int columnNum = 0; columnNum <= maxColumnNum; columnNum++) {
+                hssfSheet.autoSizeColumn(columnNum);
             }
             // 處理欄位覆寫寬度
             sheet.getOverrideColumnWidthMap().forEach(hssfSheet::setColumnWidth);
@@ -245,6 +260,7 @@ public class ExcelWriteBuilder {
             }
             // 處理欄位資料
             Map<Integer, XSSFRow> rowMap = new HashMap<>();
+            int maxColumnNum = 0;
             for (ExcelCell cell : sheet.getCellList()) {
                 XSSFRow row;
                 if (null == rowMap.get(cell.getRow())) {
@@ -253,6 +269,7 @@ public class ExcelWriteBuilder {
                 } else {
                     row = rowMap.get(cell.getRow());
                 }
+                maxColumnNum = Math.max(maxColumnNum, cell.getColumn());
                 XSSFCell xssfCell = row.createCell(cell.getColumn());
                 switch (cell.getCellType()) {
                     case FORMULA:
@@ -276,11 +293,8 @@ public class ExcelWriteBuilder {
                 if (null != cell.getStyle()) {
                     xssfCell.setCellStyle(cell.getStyle().toXSSCellStyle(workbook));
                 }
-                if (!sheet.getHiddenRowNumSet().contains(cell.getRow())
-                        || !sheet.getHiddenColumnNumSet().contains(cell.getColumn())) {
-                    xssfSheet.autoSizeColumn(cell.getColumn(), false);
-                }
             }
+
             // 處理表格欄位合併邊線顏色
             for (ExcelMergedRegion mergedRegion : sheet.getMergedRegionList()) {
                 XSSFCellStyle cellStyle = null;
@@ -300,7 +314,7 @@ public class ExcelWriteBuilder {
                         }
                         if (rowNum == mergedRegion.getFirstRow()
                                 && columnNum == mergedRegion.getFirstColumn()) {
-                            cellStyle = xssfCell.getCellStyle();
+                            cellStyle = xssfCell.getCellStyle().copy();
                             if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
                                 cellStyle.setBorderTop(mergedRegion.getBorderTop());
                                 if (null != mergedRegion.getBorderTopColor()) {
@@ -361,6 +375,10 @@ public class ExcelWriteBuilder {
             }
             for (Integer columnNum : sheet.getHiddenColumnNumSet()) {
                 xssfSheet.setColumnHidden(columnNum, true);
+            }
+            // 處理自動適應寬度
+            for (int columnNum = 0; columnNum <= maxColumnNum; columnNum++) {
+                xssfSheet.autoSizeColumn(columnNum);
             }
             // 處理欄位覆寫寬度
             sheet.getOverrideColumnWidthMap().forEach(xssfSheet::setColumnWidth);

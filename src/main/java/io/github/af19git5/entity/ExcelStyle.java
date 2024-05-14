@@ -308,7 +308,7 @@ public class ExcelStyle {
         return cellStyle;
     }
 
-    public CellStyle toXSSCellStyle(@NonNull XSSFWorkbook workbook) {
+    public XSSFCellStyle toXSSCellStyle(@NonNull XSSFWorkbook workbook) {
         XSSFCellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setLocked(this.isLock);
         cellStyle.setWrapText(this.isWrapText);

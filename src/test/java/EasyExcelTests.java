@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,7 +41,7 @@ public class EasyExcelTests {
         System.out.println(xlsxSheetList);
     }
 
-    /** 測試資料流寫出 */
+    /** 測試寫出 */
     @Test
     public void testWrite() throws ExcelException {
         ExcelStyle style =
@@ -69,6 +71,43 @@ public class EasyExcelTests {
         excelWriteBuilder.outputXlsx(TEST_OUTPUT_PATH + "test.xlsx");
     }
 
+    /** 測試寫出(大量資料) */
+    @Test
+    public void testWriteLargeData() throws ExcelException {
+        Date startTime = new Date();
+        ExcelStyle style =
+                ExcelStyle.init()
+                        .border(BorderStyle.THIN, "#D3526F")
+                        .backgroundColor("#FFF0AC")
+                        .fontColor("#000079")
+                        .build();
+        ExcelSheet sheet =
+                ExcelSheet.init()
+                        .name("工作表1")
+                        .cellList(new ArrayList<>())
+                        .mergedRegions(
+                                ExcelMergedRegion.init(0, 1, 0, 0)
+                                        .border(BorderStyle.THIN, "#000000")
+                                        .build())
+                        .build();
+        for (int rowNum = 0; rowNum < 100; rowNum++) {
+            for (int colNum = 0; colNum < 20; colNum++) {
+                sheet.getCellList()
+                        .add(ExcelCell.init(rowNum, colNum, "test").style(style).build());
+            }
+        }
+        ExcelWriteBuilder excelWriteBuilder = EasyExcel.write().addSheet(sheet);
+
+        // 測試輸出xls
+        excelWriteBuilder.outputXls(TEST_OUTPUT_PATH + "test-large.xls");
+
+        // 測試輸出xlsx
+        excelWriteBuilder.outputXlsx(TEST_OUTPUT_PATH + "test-large.xlsx");
+
+        Date endTime = new Date();
+        System.out.println("總共耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
+    }
+
     /** 測試資料流寫出 */
     @Test
     public void testStreamWrite() throws ExcelException {
@@ -87,5 +126,30 @@ public class EasyExcelTests {
                     .flush("sheet")
                     .outputXlsx(TEST_OUTPUT_PATH + "test-stream.xlsx");
         }
+    }
+
+    /** 測試資料流寫出(大量資料) */
+    @Test
+    public void testStreamWriteLargeData() throws ExcelException {
+        Date startTime = new Date();
+        try (ExcelStreamWriteBuilder writeBuilder = EasyExcel.writeStream()) {
+            ExcelStreamStyle style =
+                    ExcelStreamStyle.init()
+                            .border(BorderStyle.THIN, IndexedColors.BLACK)
+                            .backgroundColor(IndexedColors.LIGHT_YELLOW)
+                            .fontColor(IndexedColors.DARK_BLUE)
+                            .build();
+            writeBuilder.createSheet("sheet", "測試工作表");
+            for (int rowNum = 0; rowNum < 1000; rowNum++) {
+                for (int colNum = 0; colNum < 20; colNum++) {
+                    writeBuilder.addCell(
+                            "sheet",
+                            ExcelStreamCell.init(rowNum, colNum, "test").style(style).build());
+                }
+            }
+            writeBuilder.outputXlsx(TEST_OUTPUT_PATH + "test-stream-large.xlsx");
+        }
+        Date endTime = new Date();
+        System.out.println("總共耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
     }
 }
