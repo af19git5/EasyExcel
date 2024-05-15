@@ -1,11 +1,13 @@
 package io.github.af19git5.builder;
 
 import io.github.af19git5.entity.ExcelStreamCell;
+import io.github.af19git5.entity.ExcelStreamMergedRegion;
 import io.github.af19git5.entity.ExcelStreamStyle;
 import io.github.af19git5.exception.ExcelException;
 
 import lombok.NonNull;
 
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFCell;
@@ -28,12 +30,13 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     private final SXSSFWorkbook workbook;
     private final Map<String, SXSSFSheet> sheetMap;
     private final Map<String, List<ExcelStreamCell>> cellMap;
-    private final Map<ExcelStreamStyle, CellStyle> cellStyleMap = new HashMap<>();
+    private final Map<ExcelStreamStyle, CellStyle> cellStyleMap;
 
     public ExcelStreamWriteBuilder() {
         workbook = new SXSSFWorkbook();
-        sheetMap = new LinkedHashMap<>();
-        cellMap = new LinkedHashMap<>();
+        sheetMap = new HashMap<>();
+        cellMap = new HashMap<>();
+        cellStyleMap = new HashMap<>();
     }
 
     /**
@@ -53,17 +56,75 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * 增加表格欄位合併規則
      *
      * @param sheetCode 工作表代碼
-     * @param cellRangeAddresses 欄位合併規則
+     * @param mergedRegions 欄位合併規則
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addCellRangeAddress(
-            @NonNull String sheetCode, @NonNull CellRangeAddress... cellRangeAddresses) {
+    public ExcelStreamWriteBuilder mergedRegions(
+            @NonNull String sheetCode, @NonNull ExcelStreamMergedRegion... mergedRegions) {
         SXSSFSheet sheet = sheetMap.get(sheetCode);
         if (null == sheet) {
             return this;
         }
-        for (CellRangeAddress cellAddresses : cellRangeAddresses) {
-            sheet.addMergedRegionUnsafe(cellAddresses);
+        for (ExcelStreamMergedRegion mergedRegion : mergedRegions) {
+            sheet.addMergedRegionUnsafe(
+                    new CellRangeAddress(
+                            mergedRegion.getFirstRow(),
+                            mergedRegion.getLastRow(),
+                            mergedRegion.getFirstColumn(),
+                            mergedRegion.getLastColumn()));
+            CellStyle cellStyle = null;
+            for (int rowNum = mergedRegion.getFirstRow();
+                    rowNum <= mergedRegion.getLastRow();
+                    rowNum++) {
+                SXSSFRow sxssfRow = sheet.getRow(rowNum);
+                if (null == sxssfRow) {
+                    sxssfRow = sheet.createRow(rowNum);
+                }
+                for (int columnNum = mergedRegion.getFirstColumn();
+                        columnNum <= mergedRegion.getLastColumn();
+                        columnNum++) {
+                    SXSSFCell sxssfCell = sxssfRow.getCell(columnNum);
+                    if (null == sxssfCell) {
+                        sxssfCell = sxssfRow.createCell(columnNum);
+                    }
+                    if (rowNum == mergedRegion.getFirstRow()
+                            && columnNum == mergedRegion.getFirstColumn()) {
+                        cellStyle = workbook.createCellStyle();
+                        cellStyle.cloneStyleFrom(sxssfCell.getCellStyle());
+                        if (!mergedRegion.getBorderTop().equals(BorderStyle.NONE)) {
+                            cellStyle.setBorderTop(mergedRegion.getBorderTop());
+                            if (null != mergedRegion.getBorderTopColor()) {
+                                cellStyle.setTopBorderColor(
+                                        mergedRegion.getBorderTopColor().getIndex());
+                            }
+                        }
+                        if (!mergedRegion.getBorderBottom().equals(BorderStyle.NONE)) {
+                            cellStyle.setBorderBottom(mergedRegion.getBorderBottom());
+                            if (null != mergedRegion.getBorderBottomColor()) {
+                                cellStyle.setBottomBorderColor(
+                                        mergedRegion.getBorderBottomColor().getIndex());
+                            }
+                        }
+                        if (!mergedRegion.getBorderLeft().equals(BorderStyle.NONE)) {
+                            cellStyle.setBorderLeft(mergedRegion.getBorderLeft());
+                            if (null != mergedRegion.getBorderLeftColor()) {
+                                cellStyle.setLeftBorderColor(
+                                        mergedRegion.getBorderLeftColor().getIndex());
+                            }
+                        }
+                        if (!mergedRegion.getBorderRight().equals(BorderStyle.NONE)) {
+                            cellStyle.setBorderRight(mergedRegion.getBorderRight());
+                            if (null != mergedRegion.getBorderRightColor()) {
+                                cellStyle.setRightBorderColor(
+                                        mergedRegion.getBorderRightColor().getIndex());
+                            }
+                        }
+                    }
+                    if (null != cellStyle) {
+                        sxssfCell.setCellStyle(cellStyle);
+                    }
+                }
+            }
         }
         return this;
     }
@@ -72,28 +133,61 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * 增加表格欄位合併規則
      *
      * @param sheetCode 工作表代碼
-     * @param cellRangeAddressList 欄位合併規則
+     * @param mergedRegions 欄位合併規則
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addCellRangeAddress(
-            @NonNull String sheetCode, @NonNull List<CellRangeAddress> cellRangeAddressList) {
-        return addCellRangeAddress(
-                sheetCode, cellRangeAddressList.toArray(new CellRangeAddress[0]));
+    public ExcelStreamWriteBuilder mergedRegions(
+            @NonNull String sheetCode, @NonNull List<ExcelStreamMergedRegion> mergedRegions) {
+        return mergedRegions(sheetCode, mergedRegions.toArray(new ExcelStreamMergedRegion[0]));
     }
 
     /**
      * 增加隱藏列
      *
      * @param sheetCode 工作表代碼
-     * @param hiddenRowNum 隱藏列
+     * @param rowNums 隱藏列
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addHiddenRowNum(@NonNull String sheetCode, int hiddenRowNum) {
+    public ExcelStreamWriteBuilder hiddenRowNums(
+            @NonNull String sheetCode, @NonNull Integer... rowNums) {
         SXSSFSheet sheet = sheetMap.get(sheetCode);
         if (null == sheet) {
             return this;
         }
-        sheet.getRow(hiddenRowNum).setZeroHeight(true);
+        for (Integer rowNum : rowNums) {
+            sheet.getRow(rowNum).setZeroHeight(true);
+        }
+        return this;
+    }
+
+    /**
+     * 增加隱藏列
+     *
+     * @param sheetCode 工作表代碼
+     * @param hiddenRowNumSet 隱藏列
+     * @return 原方法
+     */
+    public ExcelStreamWriteBuilder hiddenRowNumSet(
+            @NonNull String sheetCode, @NonNull Set<Integer> hiddenRowNumSet) {
+        return hiddenRowNums(sheetCode, hiddenRowNumSet.toArray(new Integer[0]));
+    }
+
+    /**
+     * 增加隱藏行
+     *
+     * @param sheetCode 工作表代碼
+     * @param columnNums 隱藏行
+     * @return 原方法
+     */
+    public ExcelStreamWriteBuilder hiddenColumnNums(
+            @NonNull String sheetCode, @NonNull Integer... columnNums) {
+        SXSSFSheet sheet = sheetMap.get(sheetCode);
+        if (null == sheet) {
+            return this;
+        }
+        for (Integer columnNum : columnNums) {
+            sheet.setColumnHidden(columnNum, true);
+        }
         return this;
     }
 
@@ -101,17 +195,12 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * 增加隱藏行
      *
      * @param sheetCode 工作表代碼
-     * @param hiddenColumnNum 隱藏行
+     * @param hiddenColumnNumSet 隱藏列
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addHiddenColumnNum(
-            @NonNull String sheetCode, int hiddenColumnNum) {
-        SXSSFSheet sheet = sheetMap.get(sheetCode);
-        if (null == sheet) {
-            return this;
-        }
-        sheet.setColumnHidden(hiddenColumnNum, true);
-        return this;
+    public ExcelStreamWriteBuilder hiddenColumnNumSet(
+            @NonNull String sheetCode, @NonNull Set<Integer> hiddenColumnNumSet) {
+        return hiddenColumnNums(sheetCode, hiddenColumnNumSet.toArray(new Integer[0]));
     }
 
     /**
@@ -138,7 +227,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @param cells 欄位資料
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addCell(
+    public ExcelStreamWriteBuilder cells(
             @NonNull String sheetCode, @NonNull ExcelStreamCell... cells) {
         List<ExcelStreamCell> cellList = cellMap.get(sheetCode);
         if (cellList == null) {
@@ -155,9 +244,9 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
      * @param cellList 欄位資料
      * @return 原方法
      */
-    public ExcelStreamWriteBuilder addCell(
+    public ExcelStreamWriteBuilder cellList(
             @NonNull String sheetCode, @NonNull List<ExcelStreamCell> cellList) {
-        return addCell(sheetCode, cellList.toArray(new ExcelStreamCell[0]));
+        return cells(sheetCode, cellList.toArray(new ExcelStreamCell[0]));
     }
 
     /**
@@ -174,14 +263,10 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
         if (cellList == null) {
             return this;
         }
-        Map<Integer, SXSSFRow> rowMap = new HashMap<>();
         for (ExcelStreamCell cell : cellList) {
-            SXSSFRow row;
-            if (null == rowMap.get(cell.getRow())) {
+            SXSSFRow row = sheet.getRow(cell.getRow());
+            if (null == row) {
                 row = sheet.createRow(cell.getRow());
-                rowMap.put(cell.getRow(), row);
-            } else {
-                row = rowMap.get(cell.getRow());
             }
             SXSSFCell sxssfCell = row.createCell(cell.getColumn());
             switch (cell.getCellType()) {

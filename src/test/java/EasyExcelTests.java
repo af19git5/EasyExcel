@@ -105,7 +105,7 @@ public class EasyExcelTests {
         excelWriteBuilder.outputXlsx(TEST_OUTPUT_PATH + "test-large.xlsx");
 
         Date endTime = new Date();
-        System.out.println("總共耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
+        System.out.println("測試寫出(大量資料)，耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
     }
 
     /** 測試資料流寫出 */
@@ -120,9 +120,16 @@ public class EasyExcelTests {
                             .build();
             writeBuilder
                     .createSheet("sheet", "測試工作表")
-                    .addCell("sheet", new ExcelStreamCell("測試資料1", 0, 0, style))
-                    .flush("sheet")
-                    .addCell("sheet", new ExcelStreamCell("測試資料2", 1, 0, style))
+                    .cells(
+                            "sheet",
+                            new ExcelStreamCell("測試資料1", 0, 0, style),
+                            new ExcelStreamCell("測試資料2", 2, 0, style),
+                            new ExcelStreamCell("測試資料3", 3, 0, style))
+                    .mergedRegions(
+                            "sheet",
+                            ExcelStreamMergedRegion.init(0, 1, 0, 0)
+                                    .border(BorderStyle.THIN)
+                                    .build())
                     .flush("sheet")
                     .outputXlsx(TEST_OUTPUT_PATH + "test-stream.xlsx");
         }
@@ -142,7 +149,7 @@ public class EasyExcelTests {
             writeBuilder.createSheet("sheet", "測試工作表");
             for (int rowNum = 0; rowNum < 1000; rowNum++) {
                 for (int colNum = 0; colNum < 20; colNum++) {
-                    writeBuilder.addCell(
+                    writeBuilder.cells(
                             "sheet",
                             ExcelStreamCell.init(rowNum, colNum, "test").style(style).build());
                 }
@@ -150,6 +157,6 @@ public class EasyExcelTests {
             writeBuilder.outputXlsx(TEST_OUTPUT_PATH + "test-stream-large.xlsx");
         }
         Date endTime = new Date();
-        System.out.println("總共耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
+        System.out.println("測試資料流寫出(大量資料)，耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
     }
 }

@@ -8,7 +8,7 @@ import lombok.NonNull;
 import org.apache.poi.ss.usermodel.CellType;
 
 /**
- * Excel欄位資料建構器
+ * Excel欄位資料建構器(資料流輸出)
  *
  * @author Jimmy Kang
  */

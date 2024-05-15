@@ -10,7 +10,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 /**
- * Excel欄位資料建構器
+ * Excel樣式建構器(資料流輸出)
  *
  * @author Jimmy Kang
  */

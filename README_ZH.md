@@ -12,7 +12,7 @@
 <dependency>
   <groupId>io.github.af19git5</groupId>
   <artifactId>easy-excel</artifactId>
-  <version>1.0.9</version>
+  <version>1.0.10</version>
 </dependency>
 ```
 
@@ -75,9 +75,9 @@ try (ExcelStreamWriteBuilder writeBuilder = EasyExcel.writeStream()) {
 
     writeBuilder
             .createSheet("sheet", "Test Sheet")
-            .addCell("sheet", new ExcelStreamCell("Test Data 1", 0, 0, style))
+            .cells("sheet", new ExcelStreamCell("Test Data 1", 0, 0, style))
             .flush("sheet")
-            .addCell("sheet", new ExcelStreamCell("Test Data 2", 1, 0, style))
+            .cells("sheet", new ExcelStreamCell("Test Data 2", 1, 0, style))
             .flush("sheet")
             .outputXlsx("Your output path.");
 }
