@@ -20,7 +20,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -29,6 +31,8 @@ import java.util.List;
  * @author Jimmy Kang
  */
 public class ReadExcelService {
+
+    private final String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
     /**
      * 讀取excel資料
@@ -184,7 +188,7 @@ public class ReadExcelService {
                             .getCellList()
                             .add(
                                     new ExcelCell(
-                                            cell.toString(),
+                                            readHSSFCellValue(cell),
                                             rowNum,
                                             columnNum,
                                             cell.getCellType(),
@@ -229,7 +233,7 @@ public class ReadExcelService {
                             .getCellList()
                             .add(
                                     new ExcelCell(
-                                            cell.toString(),
+                                            readXSSFCellValue(cell),
                                             rowNum,
                                             columnNum,
                                             cell.getCellType(),
@@ -238,5 +242,37 @@ public class ReadExcelService {
             }
         }
         return excelSheet;
+    }
+
+    /**
+     * 讀取XSSFCell數值
+     *
+     * @param cell XSSFCell
+     * @return 數值
+     */
+    private String readHSSFCellValue(HSSFCell cell) {
+        if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+            // 判斷欄位是否為日期格式
+            Date date = cell.getDateCellValue();
+            return new SimpleDateFormat(dateTimeFormat).format(date);
+        } else {
+            return cell.toString();
+        }
+    }
+
+    /**
+     * 讀取XSSFCell數值
+     *
+     * @param cell XSSFCell
+     * @return 數值
+     */
+    private String readXSSFCellValue(XSSFCell cell) {
+        if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
+            // 判斷欄位是否為日期格式
+            Date date = cell.getDateCellValue();
+            return new SimpleDateFormat(dateTimeFormat).format(date);
+        } else {
+            return cell.toString();
+        }
     }
 }
