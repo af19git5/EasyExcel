@@ -81,10 +81,8 @@ public class ExcelSheet {
 
     /**
      * 將cell陣列資料轉為二維資料陣列(逐列讀出)
-     *
-     * <p>會依照Excel column及row的最大值印出該大小值的二維矩陣</>
-     *
-     * <p>欄位數值為空時會補空字串</>
+     * 會依照Excel column及row的最大值印出該大小值的二維矩陣
+     * 欄位數值為空時會補空字串
      *
      * @return 二維資料陣列
      */
