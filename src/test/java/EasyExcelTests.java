@@ -27,6 +27,23 @@ public class EasyExcelTests {
 
     /** 測試讀取 */
     @Test
+    public void test() throws ExcelException, IOException, URISyntaxException {
+        URL testXlsUrl = EasyExcelTests.class.getResource("test.xls");
+        URL testXlsxUrl = EasyExcelTests.class.getResource("test.xlsx");
+        if (null == testXlsUrl || null == testXlsxUrl) {
+            throw new IOException("查無測試檔案");
+        }
+        File testXlsFile = new File(testXlsUrl.toURI());
+        File testXlsxFile = new File(testXlsxUrl.toURI());
+        List<ExcelSheet> xlsSheetList = EasyExcel.read(testXlsFile);
+        System.out.println(xlsSheetList.get(0).toValueList());
+        List<ExcelSheet> xlsxSheetList = EasyExcel.read(testXlsxFile);
+        System.out.println(xlsxSheetList.get(0).toValueList());
+    }
+
+
+    /** 測試讀取 */
+    @Test
     public void testRead() throws ExcelException, URISyntaxException, IOException {
         URL testXlsUrl = EasyExcelTests.class.getResource("test.xls");
         URL testXlsxUrl = EasyExcelTests.class.getResource("test.xlsx");
@@ -130,6 +147,7 @@ public class EasyExcelTests {
                             ExcelStreamMergedRegion.init(0, 1, 0, 0)
                                     .border(BorderStyle.THIN)
                                     .build())
+                    .overrideColumnWidth("sheet", 0, 50 * 256)
                     .flush("sheet")
                     .outputXlsx(TEST_OUTPUT_PATH + "test-stream.xlsx");
         }

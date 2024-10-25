@@ -78,8 +78,13 @@ public class ExcelSheet {
         this.freezeColumnNum = columnNum;
         this.freezeRowNum = rowNum;
     }
+
     /**
      * 將cell陣列資料轉為二維資料陣列(逐列讀出)
+     *
+     * <p>會依照Excel column及row的最大值印出該大小值的二維矩陣</>
+     *
+     * <p>欄位數值為空時會補空字串</>
      *
      * @return 二維資料陣列
      */
@@ -88,13 +93,28 @@ public class ExcelSheet {
         cellList.sort(
                 Comparator.comparingInt(ExcelCell::getRow).thenComparingInt(ExcelCell::getColumn));
         Map<Integer, List<String>> dataMap = new LinkedHashMap<>();
+        int maxColumnNum = 0;
         for (ExcelCell cell : cellList) {
             List<String> columnList =
                     dataMap.computeIfAbsent(cell.getRow(), k -> new ArrayList<>());
             columnList.add(cell.getValue());
+            maxColumnNum = Math.max(maxColumnNum, columnList.size());
         }
         List<List<String>> dataList = new ArrayList<>();
-        dataMap.forEach((integer, columnList) -> dataList.add(columnList));
+        for (Integer rowNum : dataMap.keySet()) {
+            while (rowNum > dataList.size()) {
+                List<String> beforeColumnList = new ArrayList<>();
+                for (int i = 0; i < maxColumnNum; i++) {
+                    beforeColumnList.add("");
+                }
+                dataList.add(beforeColumnList);
+            }
+            List<String> columnList = new ArrayList<>(dataMap.get(rowNum));
+            for (int i = columnList.size(); i < maxColumnNum; i++) {
+                columnList.add("");
+            }
+            dataList.add(columnList);
+        }
         return dataList;
     }
 }

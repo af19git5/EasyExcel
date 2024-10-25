@@ -221,6 +221,24 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
     }
 
     /**
+     * 覆寫欄位寬度
+     *
+     * @param sheetCode 工作表代碼
+     * @param columnNum 欄位代碼
+     * @param width 覆寫寬度
+     * @return 原方法
+     */
+    public ExcelStreamWriteBuilder overrideColumnWidth(
+            @NonNull String sheetCode, int columnNum, int width) {
+        SXSSFSheet sheet = sheetMap.get(sheetCode);
+        if (null == sheet) {
+            return this;
+        }
+        sheet.setColumnWidth(columnNum, width);
+        return this;
+    }
+
+    /**
      * 新增欄位資料
      *
      * @param sheetCode 工作表代碼
