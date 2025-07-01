@@ -291,7 +291,12 @@ public class ExcelWriteBuilder {
                         break;
                 }
                 if (null != cell.getStyle()) {
-                    xssfCell.setCellStyle(cell.getStyle().toXSSCellStyle(workbook));
+                    XSSFCellStyle xssfCellStyle = xssfCellStyleMap.get(cell.getStyle());
+                    if (null == xssfCellStyle) {
+                        xssfCellStyle = cell.getStyle().toXSSCellStyle(workbook);
+                        xssfCellStyleMap.put(cell.getStyle(), xssfCellStyle);
+                    }
+                    xssfCell.setCellStyle(xssfCellStyle);
                 }
             }
 
