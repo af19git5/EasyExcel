@@ -1,3 +1,5 @@
+import com.github.miachm.sods.*;
+
 import io.github.af19git5.EasyExcel;
 import io.github.af19git5.builder.ExcelStreamWriteBuilder;
 import io.github.af19git5.builder.ExcelWriteBuilder;
@@ -40,7 +42,6 @@ public class EasyExcelTests {
         List<ExcelSheet> xlsxSheetList = EasyExcel.read(testXlsxFile);
         System.out.println(xlsxSheetList.get(0).toValueList());
     }
-
 
     /** 測試讀取 */
     @Test
@@ -86,6 +87,9 @@ public class EasyExcelTests {
 
         // 測試輸出xlsx
         excelWriteBuilder.outputXlsx(TEST_OUTPUT_PATH + "test.xlsx");
+
+        // 測試輸出ods
+        excelWriteBuilder.outputOds(TEST_OUTPUT_PATH + "test.ods");
     }
 
     /** 測試寫出(大量資料) */
@@ -176,5 +180,84 @@ public class EasyExcelTests {
         }
         Date endTime = new Date();
         System.out.println("測試資料流寫出(大量資料)，耗時" + (endTime.getTime() - startTime.getTime()) + "ms");
+    }
+
+    @Test
+    public void testLargeOds() {
+        try {
+            int rows = 100000;
+            int columns = 5;
+            int savePoint = 5000;
+            SpreadSheet spread = new SpreadSheet();
+            Sheet sheet = new Sheet("A", rows, columns);
+            spread.appendSheet(sheet);
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    sheet.getRange(i, j).setValues(j);
+                }
+                if (i % savePoint == 0 || i == rows - 1) {
+                    spread.save(new File("Out.ods"));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testOds() throws IOException {
+        // SpreadSheet對應ExcelWriteBuilder，表示整個ods檔案
+        SpreadSheet spreadSheet = new SpreadSheet();
+
+        // Sheet對應ExcelSheet，表示單一工作表
+        Sheet sheet = new Sheet("測試工作表1");
+        // 把建好的工作表sheet加進ods檔案
+        spreadSheet.appendSheet(sheet);
+
+        // 標題row
+        String[] titles = {"測試標題1", "測試標題2", "測試標題3", "測試標題4"};
+        sheet.appendColumns(3);
+        for (int i = 0; i < titles.length; i++) {
+            String title = titles[i];
+            // Range是指該工作表中的某一區域，對應EasyExcel要一格一格看
+            Range range = sheet.getRange(0, i);
+            range.setValue(title);
+            // Style對應ExcelStyle
+            Style style = new Style();
+            style.setBold(true);
+            style.setBackgroundColor(new Color(255, 255, 0));
+            style.setFontColor(new Color("#FF0000"));
+            Borders borders = new Borders();
+            borders.setBorder(true);
+            borders.setBorderProperties("0.07cm solid #0000FF");
+            style.setBorders(borders);
+            range.setStyle(style);
+        }
+
+        // 資料rows
+        String[][] datas1 = {
+            {"測試資料1-1", "測試資料1-2", "測試資料1-3", "測試資料1-4"},
+            {"測試資料2-1", "測試資料2-2", "測試資料2-3", "測試資料2-4"}
+        };
+        sheet.appendRows(datas1.length);
+        for (int i = 1; i <= datas1.length; i++) {
+            String[] dataRow = datas1[i - 1];
+            for (int j = 0; j < dataRow.length; j++) {
+                Range range = sheet.getRange(i, j);
+                range.setValue(dataRow[j]);
+                Style style = new Style();
+                style.setBackgroundColor(new Color(255, 192, 203));
+                style.setFontColor(new Color("#292421"));
+                Borders borders = new Borders(true);
+                style.setBorders(borders);
+                range.setStyle(style);
+            }
+
+            Range mergeRange = sheet.getRange(i, 0, 1, 4);
+            mergeRange.merge();
+        }
+
+        // ods檔案輸出
+        spreadSheet.save(new File(TEST_OUTPUT_PATH + "ods檔案1.ods"));
     }
 }

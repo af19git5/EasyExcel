@@ -1,10 +1,13 @@
 package io.github.af19git5.builder;
 
+import com.github.miachm.sods.*;
+
 import io.github.af19git5.entity.ExcelCell;
 import io.github.af19git5.entity.ExcelMergedRegion;
 import io.github.af19git5.entity.ExcelSheet;
 import io.github.af19git5.entity.ExcelStyle;
 import io.github.af19git5.exception.ExcelException;
+import io.github.af19git5.utils.SodsUtils;
 
 import lombok.NonNull;
 
@@ -15,11 +18,12 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
 
-import java.awt.*;
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -393,6 +397,100 @@ public class ExcelWriteBuilder {
     }
 
     /**
+     * 建立SpreadSheet(ods)
+     *
+     * @return SpreadSheet
+     */
+    private SpreadSheet buildSpreadSheet() throws NoSuchAlgorithmException {
+        // 新建工作簿
+        SpreadSheet spreadSheet = new SpreadSheet();
+        for (ExcelSheet excelSheet : sheetList) {
+            // 新建工作表
+            Sheet sheet = new Sheet(excelSheet.getName());
+            spreadSheet.appendSheet(sheet);
+            int maxRow = 0;
+            int maxColumn = 0;
+
+            // 處理欄位資料
+            for (ExcelCell excelCell : excelSheet.getCellList()) {
+                if (excelCell.getRow() > maxRow) {
+                    sheet.appendRows(excelCell.getRow() - maxRow);
+                    maxRow = excelCell.getRow();
+                }
+                if (excelCell.getColumn() > maxColumn) {
+                    sheet.appendColumns(excelCell.getColumn() - maxColumn);
+                    maxColumn = excelCell.getColumn();
+                }
+                Range range = sheet.getRange(excelCell.getRow(), excelCell.getColumn());
+                range.setValue(excelCell.getValue());
+                ExcelStyle excelCellStyle = excelCell.getStyle();
+                range.setStyle(SodsUtils.toSodsStyle(excelCellStyle));
+            }
+
+            // 處理表格欄位合併
+            for (ExcelMergedRegion mergedRegion : excelSheet.getMergedRegionList()) {
+                if (mergedRegion.getFirstRow().equals(mergedRegion.getLastRow())
+                        && mergedRegion.getFirstColumn().equals(mergedRegion.getLastColumn())) {
+                    // 欄位合併只有一格時略過處理
+                    continue;
+                }
+                int numRows = mergedRegion.getLastRow() - mergedRegion.getFirstRow() + 1;
+                int numColumns = mergedRegion.getLastColumn() - mergedRegion.getFirstColumn() + 1;
+                Range mergeRange =
+                        sheet.getRange(
+                                mergedRegion.getFirstRow(),
+                                mergedRegion.getFirstColumn(),
+                                numRows,
+                                numColumns);
+                mergeRange.merge();
+
+                // 處理表格欄位合併邊線顏色：合併後的欄位範圍套上EasyExcel的ExcelMergedRegion的樣式
+                Borders borders = mergeRange.getStyle().getBorders();
+                if (null != borders) {
+                    borders.setBorderTop(SodsUtils.isBorder(mergedRegion.getBorderTop()));
+                    borders.setBorderLeft(SodsUtils.isBorder(mergedRegion.getBorderLeft()));
+                    borders.setBorderBottom(SodsUtils.isBorder(mergedRegion.getBorderBottom()));
+                    borders.setBorderRight(SodsUtils.isBorder(mergedRegion.getBorderRight()));
+                    borders.setBorderTopProperties(
+                            SodsUtils.getBorderProperties(
+                                    mergedRegion, SodsUtils.BORDER_TYPE.TOP));
+                    borders.setBorderLeftProperties(
+                            SodsUtils.getBorderProperties(
+                                    mergedRegion, SodsUtils.BORDER_TYPE.LEFT));
+                    borders.setBorderBottomProperties(
+                            SodsUtils.getBorderProperties(
+                                    mergedRegion, SodsUtils.BORDER_TYPE.BOTTOM));
+                    borders.setBorderTopProperties(
+                            SodsUtils.getBorderProperties(
+                                    mergedRegion, SodsUtils.BORDER_TYPE.TOP));
+                }
+            }
+
+            // 處理行列隱藏
+            for (Integer rowNum : excelSheet.getHiddenRowNumSet()) {
+                sheet.hideRow(rowNum);
+            }
+            for (Integer columnNum : excelSheet.getHiddenColumnNumSet()) {
+                sheet.hideColumn(columnNum);
+            }
+
+            // 處理欄位覆寫寬度
+            excelSheet
+                    .getOverrideColumnWidthMap()
+                    .forEach(
+                            (columnNum, width) ->
+                                    sheet.setColumnWidth(columnNum, width.doubleValue()));
+
+            // 保護資料表
+            if (excelSheet.getIsProtect()) {
+                sheet.setPassword(excelSheet.getPassword());
+            }
+        }
+
+        return spreadSheet;
+    }
+
+    /**
      * 輸出xls
      *
      * @return byte陣列
@@ -468,6 +566,46 @@ public class ExcelWriteBuilder {
                 FileOutputStream fos = new FileOutputStream(file)) {
             workbook.write(fos);
         } catch (IOException e) {
+            throw new ExcelException(e);
+        }
+    }
+
+    /**
+     * 輸出ods
+     *
+     * @return byte陣列
+     */
+    public byte[] outputOds() throws ExcelException {
+        byte[] bytes;
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            SpreadSheet spreadSheet = buildSpreadSheet();
+            spreadSheet.save(out);
+            bytes = out.toByteArray();
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new ExcelException(e);
+        }
+        return bytes;
+    }
+
+    /**
+     * 輸出ods
+     *
+     * @param filePath 儲存檔案位置
+     */
+    public void outputOds(@NonNull String filePath) throws ExcelException {
+        outputOds(new File(filePath));
+    }
+
+    /**
+     * 輸出ods
+     *
+     * @param file 儲存檔案
+     */
+    public void outputOds(@NonNull File file) throws ExcelException {
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            SpreadSheet spreadSheet = buildSpreadSheet();
+            spreadSheet.save(fos);
+        } catch (IOException | NoSuchAlgorithmException e) {
             throw new ExcelException(e);
         }
     }
