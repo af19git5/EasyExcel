@@ -16,7 +16,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
  */
 @Getter
 @Setter
-public class ExcelStreamMergedRegion {
+public class StreamMergedRegion {
 
     /** 起始列 */
     private Integer firstRow;
@@ -54,14 +54,14 @@ public class ExcelStreamMergedRegion {
     /** 右邊線顏色 */
     private IndexedColors borderRightColor;
 
-    public ExcelStreamMergedRegion(int firstRow, int lastRow, int firstColumn, int lastColumn) {
+    public StreamMergedRegion(int firstRow, int lastRow, int firstColumn, int lastColumn) {
         this.firstRow = firstRow;
         this.lastRow = lastRow;
         this.firstColumn = firstColumn;
         this.lastColumn = lastColumn;
     }
 
-    public ExcelStreamMergedRegion(
+    public StreamMergedRegion(
             int firstRow, int lastRow, int firstColumn, int lastColumn, BorderStyle borderStyle) {
         this.firstRow = firstRow;
         this.lastRow = lastRow;

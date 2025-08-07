@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.CellType;
  */
 @Getter
 @Setter
-public class ExcelStreamCell {
+public class StreamCell {
 
     /** 欄位數值 */
     private String value;
@@ -32,13 +32,13 @@ public class ExcelStreamCell {
     /** 欄位樣式 */
     private ExcelStreamStyle style;
 
-    public ExcelStreamCell(String value, @NonNull Integer row, @NonNull Integer column) {
+    public StreamCell(String value, @NonNull Integer row, @NonNull Integer column) {
         this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
     }
 
-    public ExcelStreamCell(
+    public StreamCell(
             String value,
             @NonNull Integer row,
             @NonNull Integer column,
@@ -49,7 +49,7 @@ public class ExcelStreamCell {
         this.cellType = cellType;
     }
 
-    public ExcelStreamCell(
+    public StreamCell(
             String value, @NonNull Integer row, @NonNull Integer column, ExcelStreamStyle style) {
         this.value = null == value ? "" : value;
         this.row = row;
@@ -57,7 +57,7 @@ public class ExcelStreamCell {
         this.style = style;
     }
 
-    public ExcelStreamCell(
+    public StreamCell(
             String value,
             @NonNull Integer row,
             @NonNull Integer column,
@@ -70,13 +70,13 @@ public class ExcelStreamCell {
         this.style = style;
     }
 
-    public ExcelStreamCell(@NonNull Integer row, @NonNull Integer column, String value) {
+    public StreamCell(@NonNull Integer row, @NonNull Integer column, String value) {
         this.value = null == value ? "" : value;
         this.row = row;
         this.column = column;
     }
 
-    public ExcelStreamCell(
+    public StreamCell(
             @NonNull Integer row,
             @NonNull Integer column,
             String value,
@@ -87,7 +87,7 @@ public class ExcelStreamCell {
         this.cellType = cellType;
     }
 
-    public ExcelStreamCell(
+    public StreamCell(
             @NonNull Integer row, @NonNull Integer column, String value, ExcelStreamStyle style) {
         this.value = null == value ? "" : value;
         this.row = row;
@@ -95,7 +95,7 @@ public class ExcelStreamCell {
         this.style = style;
     }
 
-    public ExcelStreamCell(
+    public StreamCell(
             @NonNull Integer row,
             @NonNull Integer column,
             String value,

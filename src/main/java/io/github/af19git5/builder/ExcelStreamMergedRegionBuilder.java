@@ -1,6 +1,6 @@
 package io.github.af19git5.builder;
 
-import io.github.af19git5.entity.ExcelStreamMergedRegion;
+import io.github.af19git5.entity.StreamMergedRegion;
 
 import lombok.NonNull;
 
@@ -14,11 +14,11 @@ import org.apache.poi.ss.usermodel.IndexedColors;
  */
 public class ExcelStreamMergedRegionBuilder {
 
-    private final ExcelStreamMergedRegion mergedRegion;
+    private final StreamMergedRegion mergedRegion;
 
     public ExcelStreamMergedRegionBuilder(
             int firstRow, int lastRow, int firstColumn, int lastColumn) {
-        mergedRegion = new ExcelStreamMergedRegion(firstRow, lastRow, firstColumn, lastColumn);
+        mergedRegion = new StreamMergedRegion(firstRow, lastRow, firstColumn, lastColumn);
     }
 
     public ExcelStreamMergedRegionBuilder border(@NonNull BorderStyle borderStyle) {
@@ -81,7 +81,7 @@ public class ExcelStreamMergedRegionBuilder {
         return this;
     }
 
-    public ExcelStreamMergedRegion build() {
+    public StreamMergedRegion build() {
         return mergedRegion;
     }
 }
