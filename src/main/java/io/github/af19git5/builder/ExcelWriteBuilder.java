@@ -452,17 +452,16 @@ public class ExcelWriteBuilder {
                     borders.setBorderBottom(SodsUtils.isBorder(mergedRegion.getBorderBottom()));
                     borders.setBorderRight(SodsUtils.isBorder(mergedRegion.getBorderRight()));
                     borders.setBorderTopProperties(
-                            SodsUtils.getBorderProperties(
-                                    mergedRegion, SodsUtils.BORDER_TYPE.TOP));
+                            SodsUtils.getBorderProperties(mergedRegion, SodsUtils.BORDER_TYPE.TOP));
                     borders.setBorderLeftProperties(
                             SodsUtils.getBorderProperties(
                                     mergedRegion, SodsUtils.BORDER_TYPE.LEFT));
                     borders.setBorderBottomProperties(
                             SodsUtils.getBorderProperties(
                                     mergedRegion, SodsUtils.BORDER_TYPE.BOTTOM));
-                    borders.setBorderTopProperties(
+                    borders.setBorderRightProperties(
                             SodsUtils.getBorderProperties(
-                                    mergedRegion, SodsUtils.BORDER_TYPE.TOP));
+                                    mergedRegion, SodsUtils.BORDER_TYPE.RIGHT));
                 }
             }
 

@@ -4,7 +4,10 @@ import com.github.miachm.sods.Borders;
 import com.github.miachm.sods.Style;
 
 import io.github.af19git5.entity.ExcelMergedRegion;
+import io.github.af19git5.entity.ExcelStreamStyle;
 import io.github.af19git5.entity.ExcelStyle;
+import io.github.af19git5.entity.StreamMergedRegion;
+import io.github.af19git5.type.IndexedColorHex;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -62,6 +65,7 @@ public class SodsUtils {
     /**
      * EasyExcel樣式轉為SODS樣式
      *
+     * @param excelStyle Excel欄位樣式
      * @return SODS樣式
      */
     public static Style toSodsStyle(ExcelStyle excelStyle) {
@@ -90,10 +94,59 @@ public class SodsUtils {
         style.setTextAligment(toTextAlignment(excelStyle.getHorizontalAlignment()));
         style.setVerticalTextAligment(toVerticalTextAlignment(excelStyle.getVerticalAlignment()));
         if (null != excelStyle.getBackgroundColor()) {
-            style.setBackgroundColor(new com.github.miachm.sods.Color(excelStyle.getBackgroundColor()));
+            style.setBackgroundColor(
+                    new com.github.miachm.sods.Color(excelStyle.getBackgroundColor()));
         }
         if (null != excelStyle.getFontColor()) {
             style.setFontColor(new com.github.miachm.sods.Color(excelStyle.getFontColor()));
+        }
+        style.setFontSize(excelStyle.getFontSize());
+        style.setBold(excelStyle.getBold());
+        style.setItalic(excelStyle.getItalic());
+
+        return style;
+    }
+
+    /**
+     * Excel欄位樣式轉為SODS樣式
+     *
+     * @param excelStyle Excel欄位樣式
+     * @return SODS樣式
+     */
+    public static Style toSodsStyle(ExcelStreamStyle excelStyle) {
+        Style style = new Style();
+        style.setWrap(excelStyle.getIsWrapText());
+        Borders borders =
+                new Borders(
+                        isBorder(excelStyle.getBorderTop()),
+                        isBorder(excelStyle.getBorderBottom()),
+                        isBorder(excelStyle.getBorderLeft()),
+                        isBorder(excelStyle.getBorderRight()));
+        boolean isBorder =
+                isBorder(excelStyle.getBorderTop())
+                        && isBorder(excelStyle.getBorderBottom())
+                        && isBorder(excelStyle.getBorderLeft())
+                        && isBorder(excelStyle.getBorderRight());
+        borders.setBorder(isBorder);
+        if (isBorder) {
+            borders.setBorderTopProperties(getBorderProperties(excelStyle, BORDER_TYPE.TOP));
+            borders.setBorderBottomProperties(getBorderProperties(excelStyle, BORDER_TYPE.BOTTOM));
+            borders.setBorderLeftProperties(getBorderProperties(excelStyle, BORDER_TYPE.LEFT));
+            borders.setBorderRightProperties(getBorderProperties(excelStyle, BORDER_TYPE.RIGHT));
+        }
+
+        style.setBorders(borders);
+        style.setTextAligment(toTextAlignment(excelStyle.getHorizontalAlignment()));
+        style.setVerticalTextAligment(toVerticalTextAlignment(excelStyle.getVerticalAlignment()));
+        if (null != excelStyle.getBackgroundColor()) {
+            style.setBackgroundColor(
+                    new com.github.miachm.sods.Color(
+                            IndexedColorHex.convertToHex(excelStyle.getBackgroundColor())));
+        }
+        if (null != excelStyle.getFontColor()) {
+            style.setFontColor(
+                    new com.github.miachm.sods.Color(
+                            IndexedColorHex.convertToHex(excelStyle.getFontColor())));
         }
         style.setFontSize(excelStyle.getFontSize());
         style.setBold(excelStyle.getBold());
@@ -113,8 +166,9 @@ public class SodsUtils {
     }
 
     /**
-     * 轉換成sods邊線屬性
+     * Excel欄位樣式轉換成sods邊線屬性
      *
+     * @param excelStyle Excel欄位樣式
      * @param type 上下左右邊線
      * @return sods邊線屬性
      */
@@ -147,6 +201,49 @@ public class SodsUtils {
         return width + " " + lineStyle + " " + (null != color ? color : "#000000");
     }
 
+    /**
+     * Excel欄位樣式轉換成sods邊線屬性
+     *
+     * @param excelStyle Excel欄位樣式
+     * @param type 上下左右邊線
+     * @return sods邊線屬性
+     */
+    public static String getBorderProperties(ExcelStreamStyle excelStyle, BORDER_TYPE type) {
+        BorderStyle style = null;
+        String color = null;
+        switch (type) {
+            case TOP:
+                style = excelStyle.getBorderTop();
+                color = IndexedColorHex.convertToHex(excelStyle.getBorderTopColor());
+                break;
+            case BOTTOM:
+                style = excelStyle.getBorderBottom();
+                color = IndexedColorHex.convertToHex(excelStyle.getBorderBottomColor());
+                break;
+            case LEFT:
+                style = excelStyle.getBorderLeft();
+                color = IndexedColorHex.convertToHex(excelStyle.getBorderLeftColor());
+                break;
+            case RIGHT:
+                style = excelStyle.getBorderRight();
+                color = IndexedColorHex.convertToHex(excelStyle.getBorderRightColor());
+                break;
+        }
+
+        // 從 Map 取粗細與樣式，沒有找到給預設值
+        String width = borderWidths.getOrDefault(style, "0.035cm");
+        String lineStyle = borderLineStyles.getOrDefault(style, "solid");
+
+        return width + " " + lineStyle + " " + (null != color ? color : "#000000");
+    }
+
+    /**
+     * ExcelMergedRegion轉換成sods邊線屬性
+     *
+     * @param excelMergedRegion Excel合併欄位規則
+     * @param type 上下左右邊線
+     * @return sods邊線屬性
+     */
     public static String getBorderProperties(
             ExcelMergedRegion excelMergedRegion, BORDER_TYPE type) {
         BorderStyle style = null;
@@ -167,6 +264,43 @@ public class SodsUtils {
             case RIGHT:
                 style = excelMergedRegion.getBorderRight();
                 color = excelMergedRegion.getBorderRightColor();
+                break;
+        }
+
+        // 從 Map 取粗細與樣式，沒有找到給預設值
+        String width = borderWidths.getOrDefault(style, "0.035cm");
+        String lineStyle = borderLineStyles.getOrDefault(style, "solid");
+
+        return width + " " + lineStyle + " " + (null != color ? color : "#000000");
+    }
+
+    /**
+     * StreamMergedRegion轉換成sods邊線屬性
+     *
+     * @param streamMergedRegion Excel合併欄位規則
+     * @param type 上下左右邊線
+     * @return sods邊線屬性
+     */
+    public static String getBorderProperties(
+            StreamMergedRegion streamMergedRegion, BORDER_TYPE type) {
+        BorderStyle style = null;
+        String color = null;
+        switch (type) {
+            case TOP:
+                style = streamMergedRegion.getBorderTop();
+                color = IndexedColorHex.convertToHex(streamMergedRegion.getBorderTopColor());
+                break;
+            case BOTTOM:
+                style = streamMergedRegion.getBorderBottom();
+                color = IndexedColorHex.convertToHex(streamMergedRegion.getBorderBottomColor());
+                break;
+            case LEFT:
+                style = streamMergedRegion.getBorderLeft();
+                color = IndexedColorHex.convertToHex(streamMergedRegion.getBorderLeftColor());
+                break;
+            case RIGHT:
+                style = streamMergedRegion.getBorderRight();
+                color = IndexedColorHex.convertToHex(streamMergedRegion.getBorderRightColor());
                 break;
         }
 
