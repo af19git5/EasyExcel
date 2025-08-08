@@ -12,20 +12,20 @@ import org.apache.poi.ss.usermodel.CellType;
  *
  * @author Jimmy Kang
  */
-public class ExcelStreamCellBuilder {
+public class StreamCellBuilder {
 
     private final StreamCell cell;
 
-    public ExcelStreamCellBuilder(@NonNull Integer row, @NonNull Integer column, String value) {
+    public StreamCellBuilder(@NonNull Integer row, @NonNull Integer column, String value) {
         cell = new StreamCell(row, column, value);
     }
 
-    public ExcelStreamCellBuilder cellType(@NonNull CellType cellType) {
+    public StreamCellBuilder cellType(@NonNull CellType cellType) {
         cell.setCellType(cellType);
         return this;
     }
 
-    public ExcelStreamCellBuilder style(@NonNull ExcelStreamStyle style) {
+    public StreamCellBuilder style(@NonNull ExcelStreamStyle style) {
         cell.setStyle(style);
         return this;
     }

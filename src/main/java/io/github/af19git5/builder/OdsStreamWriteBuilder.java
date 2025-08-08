@@ -272,12 +272,14 @@ public class OdsStreamWriteBuilder implements StreamWriteBuilder {
             }
             Range range = sheet.getRange(cell.getRow(), cell.getColumn());
             range.setValue(cell.getValue());
-            Style style = cellStyleMap.get(cell.getStyle());
-            if (null == style) {
-                style = SodsUtils.toSodsStyle(cell.getStyle());
-                cellStyleMap.put(cell.getStyle(), style);
+            if (null != cell.getStyle()) {
+                Style style = cellStyleMap.get(cell.getStyle());
+                if (null == style) {
+                    style = SodsUtils.toSodsStyle(cell.getStyle());
+                    cellStyleMap.put(cell.getStyle(), style);
+                }
+                range.setStyle(style);
             }
-            range.setStyle(style);
         }
         spreadSheet.save(outputFile);
         cellList.clear();

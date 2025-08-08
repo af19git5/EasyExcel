@@ -1,6 +1,6 @@
 package io.github.af19git5.entity;
 
-import io.github.af19git5.builder.ExcelStreamCellBuilder;
+import io.github.af19git5.builder.StreamCellBuilder;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -108,13 +108,13 @@ public class StreamCell {
         this.style = style;
     }
 
-    public static ExcelStreamCellBuilder init(
+    public static StreamCellBuilder init(
             String value, @NonNull Integer row, @NonNull Integer column) {
-        return new ExcelStreamCellBuilder(row, column, value);
+        return new StreamCellBuilder(row, column, value);
     }
 
-    public static ExcelStreamCellBuilder init(
+    public static StreamCellBuilder init(
             @NonNull Integer row, @NonNull Integer column, String value) {
-        return new ExcelStreamCellBuilder(row, column, value);
+        return new StreamCellBuilder(row, column, value);
     }
 }
