@@ -14,123 +14,123 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
  *
  * @author Jimmy Kang
  */
-public class ExcelStreamStyleBuilder {
+public class StreamStyleBuilder {
 
     private final ExcelStreamStyle style;
 
-    public ExcelStreamStyleBuilder() {
+    public StreamStyleBuilder() {
         style = new ExcelStreamStyle();
     }
 
-    public ExcelStreamStyleBuilder wrapText() {
+    public StreamStyleBuilder wrapText() {
         style.setIsWrapText(true);
         return this;
     }
 
-    public ExcelStreamStyleBuilder lock() {
+    public StreamStyleBuilder lock() {
         style.setIsLock(true);
         return this;
     }
 
-    public ExcelStreamStyleBuilder border(@NonNull BorderStyle borderStyle) {
+    public StreamStyleBuilder border(@NonNull BorderStyle borderStyle) {
         style.setAllBorder(borderStyle);
         return this;
     }
 
-    public ExcelStreamStyleBuilder border(@NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
+    public StreamStyleBuilder border(@NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
         style.setAllBorder(borderStyle);
         style.setAllBorderColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderTop(@NonNull BorderStyle borderStyle) {
+    public StreamStyleBuilder borderTop(@NonNull BorderStyle borderStyle) {
         style.setBorderTop(borderStyle);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderTop(@NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
+    public StreamStyleBuilder borderTop(@NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
         style.setBorderTop(borderStyle);
         style.setBorderTopColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderBottom(@NonNull BorderStyle borderStyle) {
+    public StreamStyleBuilder borderBottom(@NonNull BorderStyle borderStyle) {
         style.setBorderBottom(borderStyle);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderBottom(
+    public StreamStyleBuilder borderBottom(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
         style.setBorderBottom(borderStyle);
         style.setBorderBottomColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderLeft(@NonNull BorderStyle borderStyle) {
+    public StreamStyleBuilder borderLeft(@NonNull BorderStyle borderStyle) {
         style.setBorderLeft(borderStyle);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderLeft(
+    public StreamStyleBuilder borderLeft(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
         style.setBorderLeft(borderStyle);
         style.setBorderLeftColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderRight(@NonNull BorderStyle borderStyle) {
+    public StreamStyleBuilder borderRight(@NonNull BorderStyle borderStyle) {
         style.setBorderRight(borderStyle);
         return this;
     }
 
-    public ExcelStreamStyleBuilder borderRight(
+    public StreamStyleBuilder borderRight(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors color) {
         style.setBorderRight(borderStyle);
         style.setBorderRightColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder horizontalAlignment(@NonNull HorizontalAlignment alignment) {
+    public StreamStyleBuilder horizontalAlignment(@NonNull HorizontalAlignment alignment) {
         style.setHorizontalAlignment(alignment);
         return this;
     }
 
-    public ExcelStreamStyleBuilder verticalAlignment(@NonNull VerticalAlignment alignment) {
+    public StreamStyleBuilder verticalAlignment(@NonNull VerticalAlignment alignment) {
         style.setVerticalAlignment(alignment);
         return this;
     }
 
-    public ExcelStreamStyleBuilder backgroundColor(@NonNull IndexedColors color) {
+    public StreamStyleBuilder backgroundColor(@NonNull IndexedColors color) {
         style.setBackgroundColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder fontName(@NonNull String fontName) {
+    public StreamStyleBuilder fontName(@NonNull String fontName) {
         style.setFontName(fontName);
         return this;
     }
 
-    public ExcelStreamStyleBuilder fontSize(int fontSize) {
+    public StreamStyleBuilder fontSize(int fontSize) {
         style.setFontSize(fontSize);
         return this;
     }
 
-    public ExcelStreamStyleBuilder fontColor(@NonNull IndexedColors color) {
+    public StreamStyleBuilder fontColor(@NonNull IndexedColors color) {
         style.setFontColor(color);
         return this;
     }
 
-    public ExcelStreamStyleBuilder bold() {
+    public StreamStyleBuilder bold() {
         style.setBold(true);
         return this;
     }
 
-    public ExcelStreamStyleBuilder italic() {
+    public StreamStyleBuilder italic() {
         style.setItalic(true);
         return this;
     }
 
-    public ExcelStreamStyleBuilder strikeout() {
+    public StreamStyleBuilder strikeout() {
         style.setStrikeout(true);
         return this;
     }

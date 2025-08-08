@@ -1,6 +1,6 @@
 package io.github.af19git5.entity;
 
-import io.github.af19git5.builder.ExcelStreamMergedRegionBuilder;
+import io.github.af19git5.builder.StreamMergedRegionBuilder;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -73,9 +73,9 @@ public class StreamMergedRegion {
         this.borderRight = borderStyle;
     }
 
-    public static ExcelStreamMergedRegionBuilder init(
+    public static StreamMergedRegionBuilder init(
             int firstRow, int lastRow, int firstColumn, int lastColumn) {
-        return new ExcelStreamMergedRegionBuilder(firstRow, lastRow, firstColumn, lastColumn);
+        return new StreamMergedRegionBuilder(firstRow, lastRow, firstColumn, lastColumn);
     }
 
     public void setAllBorder(BorderStyle borderStyle) {

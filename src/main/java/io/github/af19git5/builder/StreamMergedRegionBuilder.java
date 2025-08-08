@@ -12,69 +12,69 @@ import org.apache.poi.ss.usermodel.IndexedColors;
  *
  * @author Jimmy Kang
  */
-public class ExcelStreamMergedRegionBuilder {
+public class StreamMergedRegionBuilder {
 
     private final StreamMergedRegion mergedRegion;
 
-    public ExcelStreamMergedRegionBuilder(
+    public StreamMergedRegionBuilder(
             int firstRow, int lastRow, int firstColumn, int lastColumn) {
         mergedRegion = new StreamMergedRegion(firstRow, lastRow, firstColumn, lastColumn);
     }
 
-    public ExcelStreamMergedRegionBuilder border(@NonNull BorderStyle borderStyle) {
+    public StreamMergedRegionBuilder border(@NonNull BorderStyle borderStyle) {
         mergedRegion.setAllBorder(borderStyle);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder border(
+    public StreamMergedRegionBuilder border(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
         mergedRegion.setAllBorder(borderStyle);
         mergedRegion.setAllBorderColor(indexedColor);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderTop(@NonNull BorderStyle borderStyle) {
+    public StreamMergedRegionBuilder borderTop(@NonNull BorderStyle borderStyle) {
         mergedRegion.setBorderTop(borderStyle);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderTop(
+    public StreamMergedRegionBuilder borderTop(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
         mergedRegion.setBorderTop(borderStyle);
         mergedRegion.setBorderTopColor(indexedColor);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderBottom(@NonNull BorderStyle borderStyle) {
+    public StreamMergedRegionBuilder borderBottom(@NonNull BorderStyle borderStyle) {
         mergedRegion.setBorderBottom(borderStyle);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderBottom(
+    public StreamMergedRegionBuilder borderBottom(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
         mergedRegion.setBorderBottom(borderStyle);
         mergedRegion.setBorderBottomColor(indexedColor);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderLeft(@NonNull BorderStyle borderStyle) {
+    public StreamMergedRegionBuilder borderLeft(@NonNull BorderStyle borderStyle) {
         mergedRegion.setBorderLeft(borderStyle);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderLeft(
+    public StreamMergedRegionBuilder borderLeft(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
         mergedRegion.setBorderLeft(borderStyle);
         mergedRegion.setBorderLeftColor(indexedColor);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderRight(@NonNull BorderStyle borderStyle) {
+    public StreamMergedRegionBuilder borderRight(@NonNull BorderStyle borderStyle) {
         mergedRegion.setBorderRight(borderStyle);
         return this;
     }
 
-    public ExcelStreamMergedRegionBuilder borderRight(
+    public StreamMergedRegionBuilder borderRight(
             @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
         mergedRegion.setBorderRight(borderStyle);
         mergedRegion.setBorderRightColor(indexedColor);

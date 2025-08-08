@@ -1,6 +1,6 @@
 package io.github.af19git5.entity;
 
-import io.github.af19git5.builder.ExcelStreamStyleBuilder;
+import io.github.af19git5.builder.StreamStyleBuilder;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -73,8 +73,8 @@ public class ExcelStreamStyle {
     /** 是否加入刪除線 */
     @NonNull private Boolean strikeout = false;
 
-    public static ExcelStreamStyleBuilder init() {
-        return new ExcelStreamStyleBuilder();
+    public static StreamStyleBuilder init() {
+        return new StreamStyleBuilder();
     }
 
     public void setAllBorder(BorderStyle borderStyle) {
