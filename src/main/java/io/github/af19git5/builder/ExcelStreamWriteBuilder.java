@@ -301,6 +301,7 @@ public class ExcelStreamWriteBuilder implements AutoCloseable {
                     } catch (NumberFormatException e) {
                         sxssfCell.setCellValue(0);
                     }
+                    break;
                 default:
                     sxssfCell.setCellType(cell.getCellType());
                     sxssfCell.setCellValue(cell.getValue());

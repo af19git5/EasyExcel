@@ -14,7 +14,7 @@ Add this in your pom.xml dependencies.
 <dependency>
   <groupId>io.github.af19git5</groupId>
   <artifactId>easy-excel</artifactId>
-  <version>1.0.14</version>
+  <version>1.0.15</version>
 </dependency>
 ```
 
