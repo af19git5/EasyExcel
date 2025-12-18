@@ -12,7 +12,7 @@
 <dependency>
   <groupId>io.github.af19git5</groupId>
   <artifactId>easy-excel</artifactId>
-  <version>2.0.1-alpha</version>
+  <version>2.0.2-alpha</version>
 </dependency>
 ```
 

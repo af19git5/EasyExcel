@@ -120,6 +120,7 @@ public class ExcelWriteBuilder {
                         } catch (NumberFormatException e) {
                             hssfCell.setCellValue(0);
                         }
+                        break;
                     default:
                         hssfCell.setCellType(cell.getCellType());
                         hssfCell.setCellValue(cell.getValue());
@@ -289,6 +290,7 @@ public class ExcelWriteBuilder {
                         } catch (NumberFormatException e) {
                             xssfCell.setCellValue(0);
                         }
+                        break;
                     default:
                         xssfCell.setCellType(cell.getCellType());
                         xssfCell.setCellValue(cell.getValue());

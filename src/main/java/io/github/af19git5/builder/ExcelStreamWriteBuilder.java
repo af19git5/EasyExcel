@@ -312,6 +312,7 @@ public class ExcelStreamWriteBuilder implements StreamWriteBuilder {
                     } catch (NumberFormatException e) {
                         sxssfCell.setCellValue(0);
                     }
+                    break;
                 default:
                     sxssfCell.setCellType(cell.getCellType());
                     sxssfCell.setCellValue(cell.getValue());
