@@ -25,6 +25,18 @@ public class ExcelCellBuilder {
         return this;
     }
 
+    /**
+     * 設定數值(自動設為NUMERIC)
+     *
+     * @param value 數值，為null時寫出空白欄位
+     * @return 原方法
+     */
+    public ExcelCellBuilder numberValue(Number value) {
+        cell.setValue(ExcelCell.toNumberText(value));
+        cell.setCellType(CellType.NUMERIC);
+        return this;
+    }
+
     public ExcelCellBuilder style(@NonNull ExcelStyle style) {
         cell.setStyle(style);
         return this;

@@ -1,7 +1,10 @@
 package io.github.af19git5.entity;
 
 import io.github.af19git5.builder.ExcelStyleBuilder;
+import io.github.af19git5.utils.ExcelColorUtils;
+import io.github.af19git5.utils.HSSFColorPicker;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -12,18 +15,21 @@ import org.apache.poi.hssf.usermodel.HSSFPalette;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.*;
-import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTColor;
-
-import java.awt.Color;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder.BorderSide;
 
 /**
  * Excel欄位樣式資料
+ *
+ * <p>以欄位值判斷是否相等，相同樣式在同一份活頁簿只會建立一次
  *
  * @author Jimmy Kang
  */
 @Getter
 @Setter
+@EqualsAndHashCode
 public class ExcelStyle {
 
     /** 是否自動換行 */
@@ -83,54 +89,77 @@ public class ExcelStyle {
     /** 是否加入刪除線 */
     @NonNull private Boolean strikeout = false;
 
+    /** 數值格式(例如: #,##0、0.00%) */
+    private String dataFormat;
+
     public static ExcelStyleBuilder init() {
         return new ExcelStyleBuilder();
     }
 
     public void setBorderTopColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderTopColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderTopColor = hex;
         }
+    }
+
+    public void setBorderTopColor(@NonNull IndexedColors indexedColor) {
+        this.borderTopColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBorderBottomColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderBottomColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderBottomColor = hex;
         }
+    }
+
+    public void setBorderBottomColor(@NonNull IndexedColors indexedColor) {
+        this.borderBottomColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBorderLeftColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderLeftColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderLeftColor = hex;
         }
+    }
+
+    public void setBorderLeftColor(@NonNull IndexedColors indexedColor) {
+        this.borderLeftColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBorderRightColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderRightColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderRightColor = hex;
         }
+    }
+
+    public void setBorderRightColor(@NonNull IndexedColors indexedColor) {
+        this.borderRightColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBackgroundColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.backgroundColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.backgroundColor = hex;
         }
+    }
+
+    public void setBackgroundColor(@NonNull IndexedColors indexedColor) {
+        this.backgroundColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setFontColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.fontColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.fontColor = hex;
         }
     }
 
-    /**
-     * 檢查是否符合16進位色碼
-     *
-     * @param colorHex 16進位色碼
-     * @return 是否符合格式
-     */
-    private boolean isValidColorHex(@NonNull String colorHex) {
-        return colorHex.matches("^#(?:[0-9a-fA-F]{3}){1,2}$");
+    public void setFontColor(@NonNull IndexedColors indexedColor) {
+        this.fontColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setAllBorder(@NonNull BorderStyle borderStyle) {
@@ -141,12 +170,21 @@ public class ExcelStyle {
     }
 
     public void setAllBorderColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderTopColor = colorHex;
-            this.borderBottomColor = colorHex;
-            this.borderLeftColor = colorHex;
-            this.borderRightColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderTopColor = hex;
+            this.borderBottomColor = hex;
+            this.borderLeftColor = hex;
+            this.borderRightColor = hex;
         }
+    }
+
+    public void setAllBorderColor(@NonNull IndexedColors indexedColor) {
+        String hex = ExcelColorUtils.toHex(indexedColor);
+        this.borderTopColor = hex;
+        this.borderBottomColor = hex;
+        this.borderLeftColor = hex;
+        this.borderRightColor = hex;
     }
 
     public ExcelStyle() {}
@@ -160,39 +198,33 @@ public class ExcelStyle {
         this.borderLeft = cellStyle.getBorderLeft();
         this.borderRight = cellStyle.getBorderRight();
         this.borderTopColor =
-                convertRGBToHex(palette.getColor(cellStyle.getTopBorderColor()).getTriplet());
+                convertHSSFColorToHex(palette.getColor(cellStyle.getTopBorderColor()));
         this.borderBottomColor =
-                convertRGBToHex(palette.getColor(cellStyle.getBottomBorderColor()).getTriplet());
+                convertHSSFColorToHex(palette.getColor(cellStyle.getBottomBorderColor()));
         this.borderLeftColor =
-                convertRGBToHex(palette.getColor(cellStyle.getLeftBorderColor()).getTriplet());
+                convertHSSFColorToHex(palette.getColor(cellStyle.getLeftBorderColor()));
         this.borderRightColor =
-                convertRGBToHex(palette.getColor(cellStyle.getRightBorderColor()).getTriplet());
+                convertHSSFColorToHex(palette.getColor(cellStyle.getRightBorderColor()));
         this.horizontalAlignment = cellStyle.getAlignment();
         this.verticalAlignment = cellStyle.getVerticalAlignment();
-        this.backgroundColor =
-                convertRGBToHex(cellStyle.getFillForegroundColorColor().getTriplet());
+        if (FillPatternType.SOLID_FOREGROUND.equals(cellStyle.getFillPattern())) {
+            this.backgroundColor = convertHSSFColorToHex(cellStyle.getFillForegroundColorColor());
+        }
         HSSFFont font = cellStyle.getFont(workbook);
         this.fontName = font.getFontName();
         this.fontSize = (int) font.getFontHeightInPoints();
         this.bold = font.getBold();
         this.italic = font.getItalic();
         this.strikeout = font.getStrikeout();
-        HSSFColor hssfColor = font.getHSSFColor(workbook);
-        if (null != hssfColor) {
-            this.fontColor = convertRGBToHex(hssfColor.getTriplet());
-        }
+        this.fontColor = convertHSSFColorToHex(font.getHSSFColor(workbook));
+        this.dataFormat = convertDataFormat(cellStyle.getDataFormatString());
     }
 
-    private String convertRGBToHex(short[] rgbArray) {
-        if (rgbArray.length != 3) return null;
-        try {
-            String hexRed = String.format("%02X", rgbArray[0]);
-            String hexGreen = String.format("%02X", rgbArray[1]);
-            String hexBlue = String.format("%02X", rgbArray[2]);
-            return "#" + hexRed + hexGreen + hexBlue;
-        } catch (NumberFormatException e) {
-            return null;
-        }
+    private String convertHSSFColorToHex(HSSFColor color) {
+        if (null == color) return null;
+        short[] rgbArray = color.getTriplet();
+        if (null == rgbArray || rgbArray.length != 3) return null;
+        return String.format("#%02X%02X%02X", rgbArray[0], rgbArray[1], rgbArray[2]);
     }
 
     public ExcelStyle(@NonNull XSSFCellStyle cellStyle) {
@@ -208,7 +240,9 @@ public class ExcelStyle {
         this.borderRightColor = convertXSSColorToHax(cellStyle.getRightBorderXSSFColor());
         this.horizontalAlignment = cellStyle.getAlignment();
         this.verticalAlignment = cellStyle.getVerticalAlignment();
-        this.backgroundColor = convertXSSColorToHax(cellStyle.getFillForegroundColorColor());
+        if (FillPatternType.SOLID_FOREGROUND.equals(cellStyle.getFillPattern())) {
+            this.backgroundColor = convertXSSColorToHax(cellStyle.getFillForegroundColorColor());
+        }
         XSSFFont font = cellStyle.getFont();
         this.fontName = font.getFontName();
         this.fontSize = (int) font.getFontHeightInPoints();
@@ -216,6 +250,7 @@ public class ExcelStyle {
         this.italic = font.getItalic();
         this.strikeout = font.getStrikeout();
         this.fontColor = convertXSSColorToHax(font.getXSSFColor());
+        this.dataFormat = convertDataFormat(cellStyle.getDataFormatString());
     }
 
     private String convertXSSColorToHax(XSSFColor color) {
@@ -224,139 +259,42 @@ public class ExcelStyle {
         return "#" + color.getARGBHex().substring(2);
     }
 
-    public HSSFCellStyle toHSSCellStyle(@NonNull HSSFWorkbook workbook) {
-        HSSFPalette palette = workbook.getCustomPalette();
-        HSSFCellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setLocked(this.isLock);
-        cellStyle.setWrapText(this.isWrapText);
-        cellStyle.setBorderTop(this.borderTop);
-        cellStyle.setBorderBottom(this.borderBottom);
-        cellStyle.setBorderLeft(this.borderLeft);
-        cellStyle.setBorderRight(this.borderRight);
-
-        if (null != this.borderTopColor) {
-            Color rgbColor = Color.decode(this.borderTopColor);
-            HSSFColor color =
-                    palette.findSimilarColor(
-                            (byte) rgbColor.getRed(),
-                            (byte) rgbColor.getGreen(),
-                            (byte) rgbColor.getBlue());
-            cellStyle.setTopBorderColor(color.getIndex());
-        }
-
-        if (null != this.borderBottomColor) {
-            Color rgbColor = Color.decode(this.borderBottomColor);
-            HSSFColor color =
-                    palette.findSimilarColor(
-                            (byte) rgbColor.getRed(),
-                            (byte) rgbColor.getGreen(),
-                            (byte) rgbColor.getBlue());
-            cellStyle.setBottomBorderColor(color.getIndex());
-        }
-
-        if (null != this.borderLeftColor) {
-            Color rgbColor = Color.decode(this.borderLeftColor);
-            HSSFColor color =
-                    palette.findSimilarColor(
-                            (byte) rgbColor.getRed(),
-                            (byte) rgbColor.getGreen(),
-                            (byte) rgbColor.getBlue());
-            cellStyle.setLeftBorderColor(color.getIndex());
-        }
-
-        if (null != this.borderRightColor) {
-            Color rgbColor = Color.decode(this.borderRightColor);
-            HSSFColor color =
-                    palette.findSimilarColor(
-                            (byte) rgbColor.getRed(),
-                            (byte) rgbColor.getGreen(),
-                            (byte) rgbColor.getBlue());
-            cellStyle.setRightBorderColor(color.getIndex());
-        }
-
-        cellStyle.setAlignment(this.horizontalAlignment);
-        cellStyle.setVerticalAlignment(this.verticalAlignment);
-
-        if (null != this.backgroundColor) {
-            Color rgbColor = Color.decode(this.backgroundColor);
-            HSSFColor color =
-                    palette.findSimilarColor(
-                            (byte) rgbColor.getRed(),
-                            (byte) rgbColor.getGreen(),
-                            (byte) rgbColor.getBlue());
-            cellStyle.setFillForegroundColor(color.getIndex());
-            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        }
-
-        HSSFFont font = workbook.createFont();
-        if (null != this.fontName && !this.fontName.isEmpty()) {
-            font.setFontName(this.fontName);
-        }
-        font.setFontHeightInPoints(this.fontSize.shortValue());
-        font.setBold(this.bold);
-        font.setItalic(this.italic);
-        font.setStrikeout(this.strikeout);
-
-        if (null != this.fontColor) {
-            Color rgbColor = Color.decode(this.fontColor);
-            HSSFColor hssfColor =
-                    palette.findSimilarColor(
-                            rgbColor.getRed(), rgbColor.getGreen(), rgbColor.getBlue());
-            font.setColor(hssfColor.getIndex());
-        }
-        cellStyle.setFont(font);
-        return cellStyle;
+    private String convertDataFormat(String dataFormat) {
+        if (null == dataFormat || "General".equals(dataFormat)) return null;
+        return dataFormat;
     }
 
-    public XSSFCellStyle toXSSCellStyle(@NonNull XSSFWorkbook workbook) {
-        XSSFCellStyle cellStyle = workbook.createCellStyle();
+    /**
+     * 轉換為POI欄位樣式
+     *
+     * @param workbook 活頁簿(xls或xlsx)
+     * @param colorPicker xls調色盤，xlsx時可為null
+     * @return POI欄位樣式
+     */
+    public CellStyle toCellStyle(@NonNull Workbook workbook, HSSFColorPicker colorPicker) {
+        CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setLocked(this.isLock);
         cellStyle.setWrapText(this.isWrapText);
         cellStyle.setBorderTop(this.borderTop);
         cellStyle.setBorderBottom(this.borderBottom);
         cellStyle.setBorderLeft(this.borderLeft);
         cellStyle.setBorderRight(this.borderRight);
-
-        if (null != this.borderTopColor) {
-            XSSFColor color =
-                    XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
-            color.setARGBHex(this.borderTopColor.substring(1));
-            cellStyle.setTopBorderColor(color);
-        }
-
-        if (null != this.borderBottomColor) {
-            XSSFColor color =
-                    XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
-            color.setARGBHex(this.borderBottomColor.substring(1));
-            cellStyle.setBottomBorderColor(color);
-        }
-
-        if (null != this.borderLeftColor) {
-            XSSFColor color =
-                    XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
-            color.setARGBHex(this.borderLeftColor.substring(1));
-            cellStyle.setLeftBorderColor(color);
-        }
-
-        if (null != this.borderRightColor) {
-            XSSFColor color =
-                    XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
-            color.setARGBHex(this.borderRightColor.substring(1));
-            cellStyle.setRightBorderColor(color);
-        }
-
+        ExcelColorUtils.setBorderColor(cellStyle, BorderSide.TOP, this.borderTopColor, colorPicker);
+        ExcelColorUtils.setBorderColor(
+                cellStyle, BorderSide.BOTTOM, this.borderBottomColor, colorPicker);
+        ExcelColorUtils.setBorderColor(
+                cellStyle, BorderSide.LEFT, this.borderLeftColor, colorPicker);
+        ExcelColorUtils.setBorderColor(
+                cellStyle, BorderSide.RIGHT, this.borderRightColor, colorPicker);
         cellStyle.setAlignment(this.horizontalAlignment);
         cellStyle.setVerticalAlignment(this.verticalAlignment);
+        ExcelColorUtils.setBackgroundColor(cellStyle, this.backgroundColor, colorPicker);
 
-        if (null != this.backgroundColor) {
-            XSSFColor color =
-                    XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
-            color.setARGBHex(this.backgroundColor.substring(1));
-            cellStyle.setFillForegroundColor(color);
-            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        if (null != this.dataFormat && !this.dataFormat.isEmpty()) {
+            cellStyle.setDataFormat(workbook.createDataFormat().getFormat(this.dataFormat));
         }
 
-        XSSFFont font = workbook.createFont();
+        Font font = workbook.createFont();
         if (null != this.fontName && !this.fontName.isEmpty()) {
             font.setFontName(this.fontName);
         }
@@ -364,13 +302,7 @@ public class ExcelStyle {
         font.setBold(this.bold);
         font.setItalic(this.italic);
         font.setStrikeout(this.strikeout);
-
-        if (null != this.fontColor) {
-            XSSFColor color =
-                    XSSFColor.from(CTColor.Factory.newInstance(), new DefaultIndexedColorMap());
-            color.setARGBHex(this.fontColor.substring(1));
-            font.setColor(color);
-        }
+        ExcelColorUtils.setFontColor(font, this.fontColor, colorPicker);
         cellStyle.setFont(font);
         return cellStyle;
     }

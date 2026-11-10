@@ -6,6 +6,7 @@ import lombok.NonNull;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 /**
@@ -42,6 +43,13 @@ public class ExcelStyleBuilder {
         return this;
     }
 
+    public ExcelStyleBuilder border(
+            @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
+        style.setAllBorder(borderStyle);
+        style.setAllBorderColor(indexedColor);
+        return this;
+    }
+
     public ExcelStyleBuilder borderTop(@NonNull BorderStyle borderStyle) {
         style.setBorderTop(borderStyle);
         return this;
@@ -50,6 +58,13 @@ public class ExcelStyleBuilder {
     public ExcelStyleBuilder borderTop(@NonNull BorderStyle borderStyle, @NonNull String colorHex) {
         style.setBorderTop(borderStyle);
         style.setBorderTopColor(colorHex);
+        return this;
+    }
+
+    public ExcelStyleBuilder borderTop(
+            @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
+        style.setBorderTop(borderStyle);
+        style.setBorderTopColor(indexedColor);
         return this;
     }
 
@@ -65,6 +80,13 @@ public class ExcelStyleBuilder {
         return this;
     }
 
+    public ExcelStyleBuilder borderBottom(
+            @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
+        style.setBorderBottom(borderStyle);
+        style.setBorderBottomColor(indexedColor);
+        return this;
+    }
+
     public ExcelStyleBuilder borderLeft(@NonNull BorderStyle borderStyle) {
         style.setBorderLeft(borderStyle);
         return this;
@@ -77,6 +99,13 @@ public class ExcelStyleBuilder {
         return this;
     }
 
+    public ExcelStyleBuilder borderLeft(
+            @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
+        style.setBorderLeft(borderStyle);
+        style.setBorderLeftColor(indexedColor);
+        return this;
+    }
+
     public ExcelStyleBuilder borderRight(@NonNull BorderStyle borderStyle) {
         style.setBorderRight(borderStyle);
         return this;
@@ -86,6 +115,13 @@ public class ExcelStyleBuilder {
             @NonNull BorderStyle borderStyle, @NonNull String colorHex) {
         style.setBorderRight(borderStyle);
         style.setBorderRightColor(colorHex);
+        return this;
+    }
+
+    public ExcelStyleBuilder borderRight(
+            @NonNull BorderStyle borderStyle, @NonNull IndexedColors indexedColor) {
+        style.setBorderRight(borderStyle);
+        style.setBorderRightColor(indexedColor);
         return this;
     }
 
@@ -104,6 +140,11 @@ public class ExcelStyleBuilder {
         return this;
     }
 
+    public ExcelStyleBuilder backgroundColor(@NonNull IndexedColors indexedColor) {
+        style.setBackgroundColor(indexedColor);
+        return this;
+    }
+
     public ExcelStyleBuilder fontName(@NonNull String fontName) {
         style.setFontName(fontName);
         return this;
@@ -119,6 +160,11 @@ public class ExcelStyleBuilder {
         return this;
     }
 
+    public ExcelStyleBuilder fontColor(@NonNull IndexedColors indexedColor) {
+        style.setFontColor(indexedColor);
+        return this;
+    }
+
     public ExcelStyleBuilder bold() {
         style.setBold(true);
         return this;
@@ -131,6 +177,17 @@ public class ExcelStyleBuilder {
 
     public ExcelStyleBuilder strikeout() {
         style.setStrikeout(true);
+        return this;
+    }
+
+    /**
+     * 數值格式
+     *
+     * @param dataFormat Excel數值格式(例如: #,##0、0.00%)
+     * @return 原方法
+     */
+    public ExcelStyleBuilder dataFormat(@NonNull String dataFormat) {
+        style.setDataFormat(dataFormat);
         return this;
     }
 

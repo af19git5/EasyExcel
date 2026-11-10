@@ -66,7 +66,8 @@ public class ReadExcelService {
      */
     public List<ExcelSheet> read(File excelFile) throws ExcelException {
         List<ExcelSheet> excelSheetList = new ArrayList<>();
-        try (Workbook workbook = WorkbookFactory.create(excelFile)) {
+        // 以唯讀模式開啟，避免關閉時寫回原檔
+        try (Workbook workbook = WorkbookFactory.create(excelFile, null, true)) {
             excelSheetList.addAll(read(workbook));
         } catch (IOException e) {
             throw new ExcelException(e.getMessage());
@@ -84,7 +85,8 @@ public class ReadExcelService {
      */
     public List<ExcelSheet> read(File excelFile, String password) throws ExcelException {
         List<ExcelSheet> excelSheetList = new ArrayList<>();
-        try (Workbook workbook = WorkbookFactory.create(excelFile, password)) {
+        // 以唯讀模式開啟，避免關閉時寫回原檔
+        try (Workbook workbook = WorkbookFactory.create(excelFile, password, true)) {
             excelSheetList.addAll(read(workbook));
         } catch (IOException e) {
             throw new ExcelException(e.getMessage());
@@ -136,14 +138,12 @@ public class ReadExcelService {
      */
     private List<ExcelSheet> read(Workbook workbook) throws ExcelException {
         List<ExcelSheet> excelSheetList = new ArrayList<>();
-        if (workbook instanceof XSSFWorkbook) {
-            XSSFWorkbook xssfWorkbook = (XSSFWorkbook) workbook;
+        if (workbook instanceof XSSFWorkbook xssfWorkbook) {
             for (int sheetNum = 0; sheetNum < xssfWorkbook.getNumberOfSheets(); sheetNum++) {
                 XSSFSheet sheet = xssfWorkbook.getSheetAt(sheetNum);
-                excelSheetList.add(readSheet(xssfWorkbook, sheet));
+                excelSheetList.add(readSheet(sheet));
             }
-        } else if (workbook instanceof HSSFWorkbook) {
-            HSSFWorkbook hssfWorkbook = (HSSFWorkbook) workbook;
+        } else if (workbook instanceof HSSFWorkbook hssfWorkbook) {
             for (int sheetNum = 0; sheetNum < hssfWorkbook.getNumberOfSheets(); sheetNum++) {
                 HSSFSheet sheet = hssfWorkbook.getSheetAt(sheetNum);
                 excelSheetList.add(readSheet(hssfWorkbook, sheet));
@@ -202,11 +202,10 @@ public class ReadExcelService {
     /**
      * 讀取工作表資料
      *
-     * @param workbook excel資料
      * @param sheet 工作表資料
      * @return 工作表資料
      */
-    private ExcelSheet readSheet(XSSFWorkbook workbook, XSSFSheet sheet) {
+    private ExcelSheet readSheet(XSSFSheet sheet) {
         ExcelSheet excelSheet = new ExcelSheet(sheet.getSheetName(), new ArrayList<>());
         excelSheet.setMergedRegionList(new ArrayList<>());
         for (CellRangeAddress cellAddresses : sheet.getMergedRegions()) {
