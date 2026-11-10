@@ -14,4 +14,8 @@ public class ExcelException extends Exception {
     public ExcelException(Exception e) {
         super(e);
     }
+
+    public ExcelException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

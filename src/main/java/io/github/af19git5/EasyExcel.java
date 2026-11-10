@@ -1,10 +1,12 @@
 package io.github.af19git5;
 
-import io.github.af19git5.builder.ExcelStreamWriteBuilder;
 import io.github.af19git5.builder.ExcelWriteBuilder;
 import io.github.af19git5.entity.ExcelSheet;
 import io.github.af19git5.exception.ExcelException;
 import io.github.af19git5.service.ReadExcelService;
+import io.github.af19git5.type.ExcelType;
+
+import lombok.NonNull;
 
 import java.io.File;
 import java.io.InputStream;
@@ -89,20 +91,21 @@ public class EasyExcel {
     }
 
     /**
-     * 寫出excel資料
+     * 寫出excel資料(xlsx，資料流輸出，可以用在大檔匯出)
      *
-     * @return excel寫出檢購器
+     * @return excel寫出建構器
      */
     public static ExcelWriteBuilder write() {
         return new ExcelWriteBuilder();
     }
 
     /**
-     * 寫出excel資料(資料流輸出, 可以用在大檔匯出)
+     * 寫出指定檔案類型的excel資料
      *
-     * @return excel寫出檢購器
+     * @param type 檔案類型
+     * @return excel寫出建構器
      */
-    public static ExcelStreamWriteBuilder writeStream() {
-        return new ExcelStreamWriteBuilder();
+    public static ExcelWriteBuilder write(@NonNull ExcelType type) {
+        return new ExcelWriteBuilder(type);
     }
 }

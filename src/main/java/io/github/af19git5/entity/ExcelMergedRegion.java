@@ -1,12 +1,14 @@
 package io.github.af19git5.entity;
 
 import io.github.af19git5.builder.ExcelMergedRegionBuilder;
+import io.github.af19git5.utils.ExcelColorUtils;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.IndexedColors;
 
 /**
  * Excel合併欄位規則
@@ -85,45 +87,76 @@ public class ExcelMergedRegion {
     }
 
     public void setBorderTopColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderTopColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderTopColor = hex;
         }
+    }
+
+    public void setBorderTopColor(@NonNull IndexedColors indexedColor) {
+        this.borderTopColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBorderBottomColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderBottomColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderBottomColor = hex;
         }
+    }
+
+    public void setBorderBottomColor(@NonNull IndexedColors indexedColor) {
+        this.borderBottomColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBorderLeftColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderLeftColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderLeftColor = hex;
         }
+    }
+
+    public void setBorderLeftColor(@NonNull IndexedColors indexedColor) {
+        this.borderLeftColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setBorderRightColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderRightColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderRightColor = hex;
         }
+    }
+
+    public void setBorderRightColor(@NonNull IndexedColors indexedColor) {
+        this.borderRightColor = ExcelColorUtils.toHex(indexedColor);
     }
 
     public void setAllBorderColor(@NonNull String colorHex) {
-        if (isValidColorHex(colorHex)) {
-            this.borderTopColor = colorHex;
-            this.borderBottomColor = colorHex;
-            this.borderLeftColor = colorHex;
-            this.borderRightColor = colorHex;
+        String hex = ExcelColorUtils.normalizeHex(colorHex);
+        if (null != hex) {
+            this.borderTopColor = hex;
+            this.borderBottomColor = hex;
+            this.borderLeftColor = hex;
+            this.borderRightColor = hex;
         }
     }
 
+    public void setAllBorderColor(@NonNull IndexedColors indexedColor) {
+        String hex = ExcelColorUtils.toHex(indexedColor);
+        this.borderTopColor = hex;
+        this.borderBottomColor = hex;
+        this.borderLeftColor = hex;
+        this.borderRightColor = hex;
+    }
+
     /**
-     * 檢查是否符合16進位色碼
+     * 是否有設定任一邊線
      *
-     * @param colorHex 16進位色碼
-     * @return 是否符合格式
+     * @return 是否有邊線
      */
-    private boolean isValidColorHex(@NonNull String colorHex) {
-        return colorHex.matches("^#(?:[0-9a-fA-F]{3}){1,2}$");
+    public boolean hasBorder() {
+        return !BorderStyle.NONE.equals(borderTop)
+                || !BorderStyle.NONE.equals(borderBottom)
+                || !BorderStyle.NONE.equals(borderLeft)
+                || !BorderStyle.NONE.equals(borderRight);
     }
 }
